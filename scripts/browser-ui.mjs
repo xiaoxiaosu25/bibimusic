@@ -100,6 +100,10 @@ export async function queueTrackMenu(page, title) {
   const row = page.locator('.queue-track').filter({ has: page.getByRole('button', { name: '播放队列歌曲 ' + title, exact: true }) });
   const menu = row.locator('.queue-actions');
   await menu.getByRole('button', { name: '队列操作 ' + title, exact: true }).click();
+  if (await page.locator('.app').getAttribute('data-layout') === 'mobile') {
+    await menu.locator(':is([popover]:popover-open,[data-layer=popover][data-state=open])').waitFor();
+    return menu;
+  }
   const actions = page.getByRole('menu', { name: '队列操作 ' + title, exact: true });
   await actions.waitFor();
   return actions;
