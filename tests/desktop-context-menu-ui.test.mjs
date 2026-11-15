@@ -101,6 +101,10 @@ test('desktop context actions preserve playback, versions, keyboard focus and ob
   await page.keyboard.press('Escape');
   await play.click({ button: 'right' }); await menu().waitFor();
   await page.locator('.main-content').evaluate(element => element.dispatchEvent(new Event('scroll')));
+  assert(await menu().isVisible(), 'a delayed scroll event without position change leaves the menu open');
+  const scrollBefore = await page.evaluate(() => scrollY);
+  await page.evaluate(() => window.scrollBy(0, scrollY > 0 ? -1 : 1));
+  await page.waitForFunction(before => scrollY !== before, scrollBefore);
   await menu().waitFor({ state: 'hidden' });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForFunction(() => document.querySelector('.app').dataset.layout === 'mobile');
