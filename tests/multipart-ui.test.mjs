@@ -76,6 +76,7 @@ test('multipart UI: shared actions, uninterrupted expansion, saved scopes and co
   await page.goto(base);await page.locator('.music-card').nth(3).waitFor();
 
   await t.test('multipart details use the shared close target at every edge in desktop and mobile layouts',async()=>{
+    const before=library.read();
     for(const viewport of [{width:1440,height:1000},{width:1000,height:640},{width:320,height:568},{width:568,height:320}]){
       await page.setViewportSize(viewport);
       for(const point of [[.5,.5],[.5,.02],[.02,.5],[.98,.5],[.5,.98]]){
@@ -87,7 +88,7 @@ test('multipart UI: shared actions, uninterrupted expansion, saved scopes and co
         await dialog.waitFor({state:'detached'});
       }
     }
-    assert.equal(preparations.length,0);assert.equal(writes.length,0);
+    assert.equal(preparations.length,0);assert.deepEqual(library.read(),before,'opening and closing details never changes songs or playlists');
     await page.setViewportSize({width:1440,height:1000});
   });
 

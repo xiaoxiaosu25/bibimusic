@@ -63,7 +63,7 @@ test('long queue renders a window and retains keyboard focus while scrolling', a
   assert((await queue.locator('.queue-track').count()) < 35);
   const actions = queue.getByRole('button', { name: '队列操作 长队列歌曲 120', exact: true });
   await actions.click();
-  const menu = queue.getByRole('menu', { name: '队列操作 长队列歌曲 120', exact: true });
+  const menu = page.getByRole('menu', { name: '队列操作 长队列歌曲 120', exact: true });
   await menu.getByRole('menuitem', { name: '从播放队列移除', exact: true }).click();
   await queue.getByRole('button', { name: '播放队列歌曲 长队列歌曲 120', exact: true }).waitFor({ state: 'detached' });
   await queue.getByRole('heading', { name: '播放队列 119 首', exact: true }).waitFor();

@@ -55,10 +55,12 @@ test('desktop chart resolution forwards decoder support and preserves the checke
   const queries=[],f=fixture(t,{resolve:async query=>{queries.push(query);return {...entry,verifiedAudio};}}),before=f.library.read();
   const selection={kind:'chart',context:{source:'qq',title:'雨爱',artists:['杨丞琳']}};
   const result=await f.sources.playback(selection,f.signal,'title-artists',support);
-  assert.deepEqual(queries[0],{title:'雨爱',artists:['杨丞琳'],searchMode:'title-artists',audioSupport:support});
+  assert.deepEqual(queries[0],{title:'雨爱',artists:['杨丞琳'],audioSelection:{preference:'auto'},searchMode:'title-artists',audioSupport:support});
   assert.deepEqual(result.entry.verifiedAudio,verifiedAudio);assert.deepEqual(f.library.read(),before);
   const mobile=await f.sources.playback(selection,f.signal);assert.equal(mobile.entry.verifiedAudio,undefined);
-  assert.deepEqual(queries[1],{title:'雨爱',artists:['杨丞琳']});
+  assert.deepEqual(queries[1],{title:'雨爱',artists:['杨丞琳'],audioSelection:{preference:'auto'}});
+  await f.sources.playback(selection,f.signal,'title-artists',support,{preference:'compatible'});
+  assert.deepEqual(queries[2],{title:'雨爱',artists:['杨丞琳'],audioSelection:{preference:'compatible'},searchMode:'title-artists',audioSupport:support});
   await assert.rejects(f.sources.playback(selection,f.signal,'title-artists',['invalid']),{code:'invalid-input'});
 });
 test('desktop search uses catalogue duration only when its title and performers still describe the query',async t=>{

@@ -126,7 +126,7 @@ test('music browsing: discovery, four chart tabs, search dialogs and the default
     const chartRow=page.locator('.chart-song').nth(25),opener=chartRow.locator('.chart-song-search'),title=await chartRow.locator('.chart-song-title').textContent();await opener.click();await dialog.locator('.track-row').first().waitFor();
     assert.equal(await dialog.getByLabel('弹窗搜索关键词').inputValue(),title);assert.equal(await page.getByLabel('搜索歌曲或视频').inputValue(),title);assert.match(await dialog.locator('.search-description').textContent(),new RegExp(title));assert(searches.slice(-2).every(x=>x.query===title));
     const row=dialog.locator('.track-row').first();await row.getByRole('button',{name:'更多操作 '+title+' · bilibili',exact:true}).click();
-    await row.getByRole('menuitem',{name:'歌曲详情与分 P…',exact:true}).click();
+    await dialog.getByRole('menuitem',{name:'歌曲详情与分 P…',exact:true}).click();
     const child=page.getByRole('dialog',{name:'歌曲与分 P',exact:true});await child.getByRole('button',{name:'收藏',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.music-action-footer button[aria-pressed]')?.getAttribute('aria-pressed')==='true');
     await child.getByRole('button',{name:'关闭',exact:true}).click();assert(await dialog.isVisible());assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden');
     await row.getByRole('button',{name:'播放 '+title+' · bilibili',exact:true}).click();await page.waitForFunction(()=>{const a=document.querySelector('audio');return a&&!a.paused&&a.currentTime>0;});assert(prepareCalls>0);assert(await dialog.isVisible());

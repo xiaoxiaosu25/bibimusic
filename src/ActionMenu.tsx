@@ -1,5 +1,5 @@
 import { Button, type ButtonProps } from './ui/Button';
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as Menu from '@radix-ui/react-menu';
 import { DotsThreeIcon } from '@phosphor-icons/react';
 import { OPEN_DIALOG } from './ui/layers';
@@ -17,6 +17,11 @@ export function ActionMenu({ label, title, subtitle, target, actions, className 
   const returnTo = useRef<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
   const [point, setPoint] = useState<{ x: number; y: number } | null>(null);
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    // Escape animated rows and scrolling lists while staying inside native modal top layers.
+    if (open) setContainer(host.current?.closest<HTMLElement>(OPEN_DIALOG) ?? document.querySelector<HTMLElement>('.app') ?? document.body);
+  }, [open]);
   const anchor = useMemo(() => ({
     current: {
       getBoundingClientRect: () => point
@@ -61,10 +66,21 @@ export function ActionMenu({ label, title, subtitle, target, actions, className 
     const scope = host.current?.closest<HTMLElement>(target);
     if (scope) scope.dataset.contextOpen = 'true';
     const initialScroll = [scrollX, scrollY];
+    const scrollPositions = new Map<Element, [number, number]>();
+    for (let element = host.current?.parentElement; element; element = element.parentElement) {
+      scrollPositions.set(element, [element.scrollLeft, element.scrollTop]);
+    }
     const dismiss = (event: Event) => {
-      if (event.type === 'scroll' && panel.current?.contains(event.target as Node)) return;
-      if (event.type === 'scroll' && event.target === document &&
-          scrollX === initialScroll[0] && scrollY === initialScroll[1]) return;
+      if (event.type === 'scroll') {
+        if (panel.current?.contains(event.target as Node)) return;
+        if (event.target === document) {
+          if (scrollX === initialScroll[0] && scrollY === initialScroll[1]) return;
+        } else {
+          const element = event.target as Element, previous = scrollPositions.get(element);
+          // A trigger can scroll into view before click, with its scroll event delivered after opening.
+          if (!previous || (element.scrollLeft === previous[0] && element.scrollTop === previous[1])) return;
+        }
+      }
       setOpen(false);
     };
     window.addEventListener('scroll', dismiss, true);
@@ -89,6 +105,8 @@ export function ActionMenu({ label, title, subtitle, target, actions, className 
             {trigger}
           </Button>
         )}
+        {container && <Menu.Portal container={container}>
+        <div className={'action-menu-layer ' + className}>
         <Menu.Content ref={panel} id={id} className="control-popover-panel context-menu floating-menu"
           data-layer="menu" aria-label={label} side="bottom" align={point ? 'start' : 'end'} sideOffset={point ? 0 : 6}
           collisionPadding={12} loop onEntryFocus={event => {
@@ -118,6 +136,8 @@ export function ActionMenu({ label, title, subtitle, target, actions, className 
             </Menu.Item>;
           })}
         </Menu.Content>
+        </div>
+        </Menu.Portal>}
       </div>
     </Menu.Root>
   );

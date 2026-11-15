@@ -15,3 +15,4 @@
 .sidebar-playlist-item>.sidebar-playlist{width:100%}
 .sidebar-playlist-item>.action-menu{display:contents}
 @media(max-width:760px){.context-menu{max-height:calc(100dvh - 24px)}}
+.action-menu-layer{display:contents}
