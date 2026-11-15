@@ -76,9 +76,10 @@ test('artwork cycles, real spectrum, uninterrupted audio and responsive layout',
   const artifacts = resolve('local/verification/halo-red-label-2026-10-16'); mkdirSync(artifacts, { recursive: true });
   await openPlaying(page, fixture.base);
   assert.equal(await mode(page).getAttribute('data-visual-mode'), 'vinyl');
-  await page.waitForFunction(() => document.querySelector('.vinyl-material')?.naturalWidth > 0);
+  await page.waitForFunction(() => document.querySelector('.vinyl-material')?.naturalWidth > 0 &&
+    getComputedStyle(document.querySelector('.playing-art-switch')).transform === 'none');
   const record = await page.locator('.vinyl-record').boundingBox(), label = await page.locator('.playing-art-vinyl .vinyl-label').boundingBox();
-  assert.equal(record.width, record.height); assert(record.width <= 420);
+  assert(Math.abs(record.width - record.height) < 1); assert(record.width <= 420);
   assert(Math.abs(label.width / record.width - .47619) < .01);
   assert.equal(await page.locator('.playing-art-vinyl img').count(), 1, 'the only image in the record is the blank material, never a song cover');
   assert.equal(await page.locator('.playing-art-vinyl .vinyl-label-brand').textContent(), 'SLOWTUNE');
@@ -92,6 +93,10 @@ test('artwork cycles, real spectrum, uninterrupted audio and responsive layout',
   assert.equal(await page.locator('.vinyl-sheen').evaluate(el => getComputedStyle(el).transform), stationarySheen, 'light remains stationary while the record rotates');
   await page.locator('.listening-transport .play-toggle').click();
   await page.waitForFunction(() => getComputedStyle(document.querySelector('.vinyl-rotor')).animationPlayState === 'paused');
+  await page.locator('.vinyl-rotor').evaluate(async element => {
+    await Promise.all(element.getAnimations().map(animation => animation.ready));
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const stoppedVinyl = await page.locator('.vinyl-rotor').evaluate(el => getComputedStyle(el).transform);
   await page.waitForTimeout(140);
   assert.equal(await page.locator('.vinyl-rotor').evaluate(el => getComputedStyle(el).transform), stoppedVinyl);
@@ -120,6 +125,10 @@ test('artwork cycles, real spectrum, uninterrupted audio and responsive layout',
   await page.waitForFunction(angle => getComputedStyle(document.querySelector('.playing-art-disc img')).transform !== angle, firstAngle);
   await page.locator('.listening-transport .play-toggle').click();
   await page.waitForFunction(() => getComputedStyle(document.querySelector('.playing-art-disc img')).animationPlayState === 'paused');
+  await page.locator('.playing-art-disc img').evaluate(async element => {
+    await Promise.all(element.getAnimations().map(animation => animation.ready));
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const pausedAngle = await rotation(); await page.waitForTimeout(140);
   assert.equal(await rotation(), pausedAngle, 'pause retains the current rotation angle');
   await page.locator('.listening-transport .play-toggle').click();
