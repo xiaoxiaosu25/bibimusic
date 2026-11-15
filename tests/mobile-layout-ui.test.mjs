@@ -15,7 +15,7 @@ test('mobile navigation, player and direct lyrics keep one audio session and fit
   await context.addInitScript(record=>{localStorage.setItem('slow-listening:playback:v3',JSON.stringify(record));localStorage.setItem('slow-listening:theme:v1','light');},queueRecord(fixture.tracks));
   const page = await context.newPage(), errors = [], artifacts = join(developmentPaths().artifacts,'mobile-layout');
   mkdirSync(artifacts,{recursive:true}); page.on('pageerror',error=>errors.push(error.message)); page.setDefaultTimeout(10000);
-  await page.goto(fixture.base);
+  await page.goto(fixture.base, {waitUntil:'domcontentloaded'});
   const primary = page.getByRole('navigation',{name:'手机导航',exact:true});
   await primary.waitFor();
   const miniPlay=await page.locator('.mobile-mini-transport .play-toggle').boundingBox();assert(miniPlay.width>=48&&miniPlay.height>=48,'mini-player playback has a 48px touch target');
@@ -109,7 +109,7 @@ test('mobile long titles leave lyrics and queue readable on short portrait and l
   const context = await browser.newContext({viewport:{width:320,height:568},hasTouch:true});
   await context.addInitScript(record=>localStorage.setItem('slow-listening:playback:v3',JSON.stringify(record)),queueRecord(fixture.tracks));
   const page = await context.newPage(); page.setDefaultTimeout(5000);
-  await page.goto(fixture.base);
+  await page.goto(fixture.base, {waitUntil:'domcontentloaded'});
   await page.getByRole('button',{name:'打开正在播放',exact:true}).click();
   await page.getByRole('button',{name:'播放',exact:true}).click();
   await page.getByRole('button',{name:'查看歌词',exact:true}).click();
@@ -140,7 +140,7 @@ test('short landscape keeps version selection separate from seeking and playback
   const context = await browser.newContext({viewport:{width:568,height:320},hasTouch:true});
   await context.addInitScript(record=>localStorage.setItem('slow-listening:playback:v3',JSON.stringify(record)),queueRecord(fixture.tracks));
   const page = await context.newPage(); page.setDefaultTimeout(5000);
-  await page.goto(fixture.base);
+  await page.goto(fixture.base, {waitUntil:'domcontentloaded'});
   await page.getByRole('button',{name:'打开正在播放',exact:true}).click();
   await page.getByRole('button',{name:'播放',exact:true}).click();
   await page.waitForFunction(()=>{const audio=document.querySelector('audio');return audio&&!audio.paused&&audio.currentTime>.1;});
@@ -174,7 +174,7 @@ test('mobile Back skips replaced playback menus after lyrics settings close', {t
   for (const closeWithBack of [false, true]) {
     const context = await browser.newContext({viewport:{width:390,height:844},hasTouch:true});
     const page = await context.newPage(); page.setDefaultTimeout(5000);
-    await page.goto(fixture.base);
+    await page.goto(fixture.base, {waitUntil:'domcontentloaded'});
     await page.getByRole('button',{name:'打开正在播放',exact:true}).click();
     await page.getByRole('button',{name:'更多播放选项',exact:true}).click();
     await page.getByRole('button',{name:'歌词设置',exact:true}).click();
@@ -209,7 +209,7 @@ test('mobile song hierarchy keeps canonical metadata, source versions and queue 
     else for(const field of ['songs','versions','favorites','playlists'])state.snapshot[field]=[];
     await route.fulfill({json:state});
   });
-  await page.goto(fixture.base);await page.getByRole('button',{name:'打开正在播放',exact:true}).click();
+  await page.goto(fixture.base, {waitUntil:'domcontentloaded'});await page.getByRole('button',{name:'打开正在播放',exact:true}).click();
   await page.getByRole('button',{name:'播放',exact:true}).click();
   await page.waitForFunction(()=>{const audio=document.querySelector('audio');return audio&&!audio.paused&&audio.currentTime>.1;});
   await page.evaluate(()=>{window.__hierarchyAudio=document.querySelector('audio');});

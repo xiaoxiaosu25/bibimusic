@@ -134,6 +134,10 @@ test('mobile disclosures and dropdown padding respond to taps outside the glyph'
   await page.getByRole('button', { name: '更多播放选项', exact: true }).click();
   const sheet = page.getByRole('dialog', { name: '更多播放选项', exact: true });
   const rate = sheet.getByRole('button', { name: '播放速度', exact: true });
+  await sheet.evaluate(async element => {
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await Promise.all(element.getAnimations({ subtree: true }).filter(animation => Number.isFinite(animation.effect?.getComputedTiming().endTime)).map(animation => animation.finished.catch(() => {})));
+  });
   await assertControlHitTarget(rate, 48);
   await clickControlPoint(page, rate, [.95, .5], true);
   const choice = page.getByRole('menuitemradio', { name: '1.5×', exact: true });

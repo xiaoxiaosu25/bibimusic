@@ -93,6 +93,10 @@ test('artwork cycles, real spectrum, uninterrupted audio and responsive layout',
   assert.equal(await page.locator('.vinyl-sheen').evaluate(el => getComputedStyle(el).transform), stationarySheen, 'light remains stationary while the record rotates');
   await page.locator('.listening-transport .play-toggle').click();
   await page.waitForFunction(() => getComputedStyle(document.querySelector('.vinyl-rotor')).animationPlayState === 'paused');
+  await page.locator('.vinyl-rotor').evaluate(async element => {
+    await Promise.all(element.getAnimations().map(animation => animation.ready));
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const stoppedVinyl = await page.locator('.vinyl-rotor').evaluate(el => getComputedStyle(el).transform);
   await page.waitForTimeout(140);
   assert.equal(await page.locator('.vinyl-rotor').evaluate(el => getComputedStyle(el).transform), stoppedVinyl);
@@ -121,6 +125,10 @@ test('artwork cycles, real spectrum, uninterrupted audio and responsive layout',
   await page.waitForFunction(angle => getComputedStyle(document.querySelector('.playing-art-disc img')).transform !== angle, firstAngle);
   await page.locator('.listening-transport .play-toggle').click();
   await page.waitForFunction(() => getComputedStyle(document.querySelector('.playing-art-disc img')).animationPlayState === 'paused');
+  await page.locator('.playing-art-disc img').evaluate(async element => {
+    await Promise.all(element.getAnimations().map(animation => animation.ready));
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   const pausedAngle = await rotation(); await page.waitForTimeout(140);
   assert.equal(await rotation(), pausedAngle, 'pause retains the current rotation angle');
   await page.locator('.listening-transport .play-toggle').click();
