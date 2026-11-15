@@ -64,7 +64,7 @@ export async function libraryAction(page, name) {
   }
   const library = page.locator('.song-library-page');
   const mobile = await page.locator('.app').getAttribute('data-layout')==='mobile';
-  const action = (mobile?page:library).getByRole(mobile?'button':'menuitem', { name, exact: true });
+  const action = (mobile?page:page.getByRole('menu', { name:'歌单管理', exact:true })).getByRole(mobile?'button':'menuitem', { name, exact: true });
   if (!await action.isVisible()) await library.getByRole('button', { name: '歌单管理', exact: true }).click();
   await action.click();
 }
