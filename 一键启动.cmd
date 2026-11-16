@@ -9,7 +9,7 @@ if errorlevel 1 (
 )
 node "%~dp0scripts\desktop.mjs" --detach
 if errorlevel 1 (
-  echo 慢听桌面端启动失败，请查看上方错误。
+  echo 哔哔音乐桌面端启动失败，请查看上方错误。
   pause
   exit /b 1
 )

@@ -41,14 +41,14 @@ export function TopBar() {
               <div className="listening-header-title">
                 <h1>正在播放</h1>
                 <span>
-                  {snapshot.items.length ? `${snapshot.items.length} 首音乐 · 慢听` : '慢听 · 音乐空间'}
+                  {snapshot.items.length ? `${snapshot.items.length} 首音乐 · 哔哔音乐` : '哔哔音乐 · 音乐空间'}
                 </span>
               </div>
             </>
           ) : (
             <>
               <Button variant="plain" className="brand" onClick={() => navigate('discover')}>
-                慢听
+                哔哔音乐
               </Button>
               <nav className="desktop-nav" aria-label="主导航">
                 {nav.map((n) => (

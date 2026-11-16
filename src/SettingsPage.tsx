@@ -92,17 +92,17 @@ export function SettingsPage({ desktopLyricsRequest = 0, onSectionChanged, statu
       <h1 id="settings-heading">设置</h1>
     </div>
     <div className="settings-body">
-      <nav className="settings-nav" ref={navigation} aria-label="设置分组">{sections.filter(item => item.id === 'access' ? !window.slowTuneDesktop : ['desktop-lyrics','local-data'].includes(item.id) ? !!window.slowTuneDesktop : true).map(item =>
-        <Button variant="plain" key={item.id} className={'nav-item ' + (section === item.id ? 'active' : '')} aria-current={section === item.id ? 'true' : undefined} onClick={() => openSection(item.id)}><item.icon size={19}/>{item.id === 'diagnostics' && window.slowTuneDesktop ? '运行信息' : item.label}</Button>
+      <nav className="settings-nav" ref={navigation} aria-label="设置分组">{sections.filter(item => item.id === 'access' ? !window.biBiMusicDesktop : ['desktop-lyrics','local-data'].includes(item.id) ? !!window.biBiMusicDesktop : true).map(item =>
+        <Button variant="plain" key={item.id} className={'nav-item ' + (section === item.id ? 'active' : '')} aria-current={section === item.id ? 'true' : undefined} onClick={() => openSection(item.id)}><item.icon size={19}/>{item.id === 'diagnostics' && window.biBiMusicDesktop ? '运行信息' : item.label}</Button>
       )}</nav>
       <div className="settings-panels" ref={panels}>
         <section className="panel" data-settings-section="appearance" hidden={section !== 'appearance'} aria-label="外观">
           <ThemeSettings/>
           <WelcomeSettings/>
         </section>
-        {window.slowTuneDesktop&&<section className="panel" data-settings-section="desktop-lyrics" hidden={section !== 'desktop-lyrics'} aria-label="桌面歌词"><DesktopLyricsSettings/></section>}
-        {!window.slowTuneDesktop&&<section className="panel" data-settings-section="access" hidden={section !== 'access'} aria-label="启动与访问"><AccessSettings onChanged={onReload}/></section>}
-        {window.slowTuneDesktop&&<section className="panel" data-settings-section="local-data" hidden={section !== 'local-data'} aria-label="本地资料"><DesktopDataSettings onOpenBackup={onOpenBackup}/></section>}
+        {window.biBiMusicDesktop&&<section className="panel" data-settings-section="desktop-lyrics" hidden={section !== 'desktop-lyrics'} aria-label="桌面歌词"><DesktopLyricsSettings/></section>}
+        {!window.biBiMusicDesktop&&<section className="panel" data-settings-section="access" hidden={section !== 'access'} aria-label="启动与访问"><AccessSettings onChanged={onReload}/></section>}
+        {window.biBiMusicDesktop&&<section className="panel" data-settings-section="local-data" hidden={section !== 'local-data'} aria-label="本地资料"><DesktopDataSettings onOpenBackup={onOpenBackup}/></section>}
         <section className="panel" data-settings-section="sources" hidden={section !== 'sources'} aria-label="音乐来源"><SourceSettings state={sources} onChanged={onSourcesChanged} onOpenAbout={openAbout}/></section>
         <section className="panel" data-settings-section="account" hidden={section !== 'account'} aria-label="B站账号">
           <BilibiliAccountControls status={account} onChange={onAccountChange} onOpenAbout={openAbout}/>
@@ -112,7 +112,7 @@ export function SettingsPage({ desktopLyricsRequest = 0, onSectionChanged, statu
           {section==='recommendation'&&<SearchPreferencesSettings onChanged={onSearchPreferencesChanged}/>}
           <RecommendationSettings onChanged={onRecommendationChanged} accountAuthenticated={account?.state === 'authenticated'} youtubeEnabled={sources?.youtube.enabled??status?.providers.youtube.enabled??status?.providers.youtube.available??false}/>
         </section>
-        <section className="panel" data-settings-section="diagnostics" hidden={section !== 'diagnostics'} aria-label={window.slowTuneDesktop ? '运行信息' : '诊断与数据'}>
+        <section className="panel" data-settings-section="diagnostics" hidden={section !== 'diagnostics'} aria-label={window.biBiMusicDesktop ? '运行信息' : '诊断与数据'}>
           <DiagnosticsPanel status={status} checkedAt={statusCheckedAt} account={account} library={library} onRefresh={onRefreshDiagnostics} onStopPlayback={onStopPlayback} onLogout={onLogout} onOpenBackup={onOpenBackup} onOpenSources={() => openSection('sources')} onOpenAccount={() => openSection('account')} onOpenAbout={openAbout}/>
         </section>
         <section className="panel" data-settings-section="about" hidden={section !== 'about'} aria-label="关于与声明"><AboutPanel active={section === 'about'} status={status}/></section>

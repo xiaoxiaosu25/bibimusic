@@ -107,6 +107,11 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   });
   await page.waitForFunction(() => innerWidth <= 1000);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  assert.equal(await page.locator('.brand-wordmark').evaluate(element => {
+    const range = document.createRange(); range.selectNodeContents(element.firstChild);
+    return range.getClientRects().length;
+  }), 1, 'the complete Chinese brand stays on one line in the narrowest desktop sidebar');
+  assert.equal(await page.locator('.sidebar>.brand').evaluate(element => element.scrollWidth <= element.clientWidth), true, 'the brand fits without clipping or horizontal overflow');
   await captureDesktopWindow(application, page, join(directory, 'integrated-minimum.png'));
   await application.evaluate(({ BrowserWindow }) => { const w = BrowserWindow.getAllWindows().find(w => w.webContents.getURL().startsWith('http:')); w.setSize(1360,860); w.setFullScreen(true); });
   await page.waitForFunction(() => document.documentElement.dataset.desktopFullscreen === 'true');
@@ -182,7 +187,7 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   };
   await overlay.waitForFunction(() => document.querySelector('#current')?.dataset.line === '1');
   await assertOverlayTopmost('created and shown');
-  const originalSource = await overlay.evaluate(() => window.slowTuneLyrics.getState().then(state => state.document.sourceKey));
+  const originalSource = await overlay.evaluate(() => window.biBiMusicLyrics.getState().then(state => state.document.sourceKey));
   assert.equal((await overlay.locator('#current .word > span:first-child').allTextContents()).join(''), '听风');
   assert.equal(await page.locator('audio').count(), 1); assert.equal(fixture.preparations.length, preparations); assert.equal(await page.locator('audio').getAttribute('src'), source);
   await overlay.waitForFunction(() => { const fill = document.querySelector('.word'); return fill && Number(fill.style.getPropertyValue('--fill')) > .4 && Number(fill.style.getPropertyValue('--fill')) < .6; });
@@ -194,16 +199,16 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   await overlay.locator('body').screenshot({ path: join(directory, 'floating-translation.png'), omitBackground: true });
   await page.locator('audio').evaluate(audio => { audio.playbackRate = 2; audio.currentTime = 7; audio.dispatchEvent(new Event('timeupdate')); });
   await overlay.waitForFunction(() => document.querySelector('#current')?.dataset.line === '1');
-  const lyricSnapshot = await page.evaluate(() => window.slowTuneDesktop.getState());
+  const lyricSnapshot = await page.evaluate(() => window.biBiMusicDesktop.getState());
   const waitForOverlayVisibility = async expected => {
     for (let n = 0; n < 100; n++) {
-      const visible = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词').isVisible());
+      const visible = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词').isVisible());
       if (visible === expected) return;
       await sleep(30);
     }
     assert.fail('Floating lyric window visibility did not become ' + expected);
   };
-  const publishLyricDocument = value => page.evaluate(value => window.slowTuneDesktop.publishDocument(value), value);
+  const publishLyricDocument = value => page.evaluate(value => window.biBiMusicDesktop.publishDocument(value), value);
   for (const value of [
     { ...lyricSnapshot.document, lines: [], synced: false, status: '正在寻找歌词…' },
     { ...lyricSnapshot.document, lines: [], status: '暂无匹配歌词' },
@@ -213,7 +218,7 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   ]) {
     await publishLyricDocument(value); await waitForOverlayVisibility(false);
     await overlay.waitForFunction(() => document.body.dataset.hasLyrics === 'false' && document.querySelector('#current').textContent === '' && document.querySelector('#secondary').textContent === '');
-    assert.equal(await page.evaluate(() => window.slowTuneDesktop.getState().then(state => state.preferences.visible)), true, 'automatic hiding preserves the enabled preference');
+    assert.equal(await page.evaluate(() => window.biBiMusicDesktop.getState().then(state => state.preferences.visible)), true, 'automatic hiding preserves the enabled preference');
   }
   await publishLyricDocument({ ...lyricSnapshot.document, synced: false, lines: [{ startMs: null, text: '没有时间轴的歌词' }, { startMs: null, text: '仍然有真实文字' }] });
   await waitForOverlayVisibility(true);
@@ -223,19 +228,19 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   await assertOverlayTopmost('hidden and shown again');
   // Match the real paused player: its periodic host snapshot remains authoritative.
   await page.locator('audio').evaluate(audio => { audio.currentTime = 0; audio.dispatchEvent(new Event('timeupdate')); });
-  await page.evaluate(sourceKey => window.slowTuneDesktop.publishClock({ sourceKey, position: 0, playing: false }), originalSource);
+  await page.evaluate(sourceKey => window.biBiMusicDesktop.publishClock({ sourceKey, position: 0, playing: false }), originalSource);
   await overlay.getByText('让晚风慢慢经过身旁', { exact: true }).waitFor();
   await waitForOverlayVisibility(true);
-  await page.evaluate(() => window.slowTuneDesktop.setLyricsVisible(false));
+  await page.evaluate(() => window.biBiMusicDesktop.setLyricsVisible(false));
   await publishLyricDocument({ ...lyricSnapshot.document, lines: [] });
   await publishLyricDocument(lyricSnapshot.document); await waitForOverlayVisibility(false);
-  assert.equal(await page.evaluate(() => window.slowTuneDesktop.getState().then(state => state.preferences.visible)), false, 'new lyrics do not override a manual close');
+  assert.equal(await page.evaluate(() => window.biBiMusicDesktop.getState().then(state => state.preferences.visible)), false, 'new lyrics do not override a manual close');
   await page.locator('audio').evaluate((audio, position) => { audio.currentTime = position; audio.dispatchEvent(new Event('timeupdate')); }, lyricSnapshot.clock.position);
-  await page.evaluate(clock => { window.slowTuneDesktop.publishClock(clock); return window.slowTuneDesktop.setLyricsVisible(true); }, lyricSnapshot.clock);
+  await page.evaluate(clock => { window.biBiMusicDesktop.publishClock(clock); return window.biBiMusicDesktop.setLyricsVisible(true); }, lyricSnapshot.clock);
   await waitForOverlayVisibility(true);
   await overlay.waitForFunction(() => document.querySelector('#current')?.dataset.line === '1');
-  const overlayBounds = () => application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '慢听 · 桌面歌词').getBounds());
-  await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '慢听 · 桌面歌词').setPosition(120, 140));
+  const overlayBounds = () => application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '哔哔音乐 · 桌面歌词').getBounds());
+  await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '哔哔音乐 · 桌面歌词').setPosition(120, 140));
   const beforeOptions = await overlayBounds();
   for (const close of ['button', 'escape']) {
     await overlay.getByRole('button', { name: '歌词显示选项', exact: true }).click();
@@ -249,35 +254,35 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   await overlay.getByRole('button', { name: '歌词显示选项', exact: true }).click();
   await overlay.getByRole('heading', { name: '快捷设置', exact: true }).waitFor();
   const expanded = await overlayBounds();
-  await application.evaluate(({ BrowserWindow }, bounds) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '慢听 · 桌面歌词').setPosition(bounds.x + 24, bounds.y + 24), expanded);
+  await application.evaluate(({ BrowserWindow }, bounds) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '哔哔音乐 · 桌面歌词').setPosition(bounds.x + 24, bounds.y + 24), expanded);
   await overlay.getByRole('slider', { name: '桌面歌词字号', exact: true }).fill('64');
-  await overlay.waitForFunction(() => window.slowTuneLyrics.getState().then(state => state.preferences.fontSize === 64));
+  await overlay.waitForFunction(() => window.biBiMusicLyrics.getState().then(state => state.preferences.fontSize === 64));
   await overlay.keyboard.press('Escape');
   await overlay.waitForFunction(() => !document.querySelector('#display-options').matches(':popover-open') && innerHeight < 320);
   const moved = await overlayBounds();
   assert.equal(moved.x, beforeOptions.x + 24);
   assert.equal(moved.y + moved.height, beforeOptions.y + beforeOptions.height + 24, 'dragging and changing font size preserve the compact bottom anchor');
-  await overlay.evaluate(() => window.slowTuneLyrics.updatePreferences({ fontSize: 32 }));
-  await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '慢听 · 桌面歌词').setPosition(120, 140));
+  await overlay.evaluate(() => window.biBiMusicLyrics.updatePreferences({ fontSize: 32 }));
+  await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '哔哔音乐 · 桌面歌词').setPosition(120, 140));
   await overlay.getByRole('button', { name: '歌词显示选项', exact: true }).click();
   await overlay.getByRole('heading', { name: '快捷设置', exact: true }).waitFor();
   assert.equal(await overlay.locator('#toolbar button svg').count(), 7);
-  const compactBounds = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '慢听 · 桌面歌词').getBounds());
+  const compactBounds = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(w => w.getTitle() === '哔哔音乐 · 桌面歌词').getBounds());
   const panelBounds = await overlay.locator('#display-options').boundingBox(), toolbarBounds = await overlay.locator('#toolbar').boundingBox();
   assert(panelBounds.y >= 8 && panelBounds.y + panelBounds.height <= toolbarBounds.y, 'quick settings fit above the toolbar without clipping lyrics');
   await overlay.getByRole('slider', { name: '桌面歌词字号', exact: true }).fill('30');
   await overlay.getByRole('button', { name: '晴蓝', exact: true }).click();
-  await overlay.waitForFunction(() => window.slowTuneLyrics.getState().then(state => state.preferences.fontSize === 30 && state.preferences.highlight === '#a7d8ff'));
+  await overlay.waitForFunction(() => window.biBiMusicLyrics.getState().then(state => state.preferences.fontSize === 30 && state.preferences.highlight === '#a7d8ff'));
   await overlay.locator('#lyric-color').fill('#ddeeff');
-  await overlay.waitForFunction(() => window.slowTuneLyrics.getState().then(state => state.preferences.color === '#ddeeff'));
+  await overlay.waitForFunction(() => window.biBiMusicLyrics.getState().then(state => state.preferences.color === '#ddeeff'));
   await overlay.getByRole('button', { name: '减小字号', exact: true }).click();
   await overlay.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue('--lyric-size') === '28px');
   const doubleLane=await overlay.locator('#current').boundingBox();
-  const doubleWindow=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle()==='慢听 · 桌面歌词').getBounds());
+  const doubleWindow=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle()==='哔哔音乐 · 桌面歌词').getBounds());
   await overlay.getByRole('checkbox', { name: '双行歌词', exact: true }).uncheck();
   await overlay.waitForFunction(() => document.body.dataset.lines === '1');
   assert.deepEqual(await overlay.locator('#current').boundingBox(),doubleLane,'single-line mode keeps the singing line in place');
-  assert.deepEqual(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle()==='慢听 · 桌面歌词').getBounds()),doubleWindow,'line count does not move or resize the native window');
+  assert.deepEqual(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle()==='哔哔音乐 · 桌面歌词').getBounds()),doubleWindow,'line count does not move or resize the native window');
   await overlay.getByRole('checkbox', { name: '双行歌词', exact: true }).check();
   await overlay.waitForFunction(() => document.body.dataset.lines === '2');
   assert.equal((await overlay.locator('#current .word > span:first-child').allTextContents()).join(''), '听风', 'display toggles retain the current lyric');
@@ -297,9 +302,9 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   await settings.getByText('歌词位置已重置。', { exact: true }).waitFor();
   await captureDesktopWindow(application, page, join(directory, 'desktop-lyrics-settings.png'));
   assert.equal(await page.locator('audio').getAttribute('src'), source); assert.equal(fixture.preparations.length, preparations);
-  await application.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词'); window.setPosition(120, 140); });
+  await application.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词'); window.setPosition(120, 140); });
   await application.evaluate(({ BrowserWindow, screen }) => {
-    const window = BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词');
+    const window = BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词');
     const original = window.setIgnoreMouseEvents.bind(window);
     window.setIgnoreMouseEvents = (ignore, options) => { globalThis.lyricsIgnoreMouse = ignore; return original(ignore, options); };
     // CDP mouse input has a virtual pointer. Supply its corresponding desktop
@@ -314,7 +319,7 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
     assert.equal(await ignoresMouse(), expected, message);
   };
   const nativePointer = (x, y) => application.evaluate(({ BrowserWindow }, point) => {
-    const bounds = BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词').getContentBounds();
+    const bounds = BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词').getContentBounds();
     globalThis.lyricsCursor = { x: bounds.x + point.x, y: bounds.y + point.y };
   }, { x, y });
   const movePointer = async (x, y) => { await nativePointer(x, y); await overlay.mouse.move(x, y); };
@@ -322,8 +327,8 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   const lyricPosition = () => overlay.locator('#current').evaluate(element => { const rect = element.getBoundingClientRect(); return { x: rect.x, y: rect.y }; });
   const unlockedPosition = await lyricPosition();
   await overlay.getByRole('button', { name: '锁定', exact: true }).click();
-  await page.waitForFunction(() => window.slowTuneDesktop.getState().then(state => state.preferences.locked));
-  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词').isFocusable()), false);
+  await page.waitForFunction(() => window.biBiMusicDesktop.getState().then(state => state.preferences.locked));
+  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词').isFocusable()), false);
   await assertOverlayTopmost('locked');
   assert.deepEqual(await lyricPosition(), unlockedPosition, 'locking does not move the lyric');
   await overlay.getByText('已锁定 · 悬停或从托盘解锁', { exact: true }).waitFor();
@@ -364,20 +369,20 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   await overlay.getByRole('button', { name: '解锁歌词', exact: true }).waitFor();
   await hoverUnlock();
   await overlay.getByRole('button', { name: '解锁歌词', exact: true }).click();
-  await page.waitForFunction(() => window.slowTuneDesktop.getState().then(state => !state.preferences.locked));
+  await page.waitForFunction(() => window.biBiMusicDesktop.getState().then(state => !state.preferences.locked));
   assert.deepEqual(await lyricPosition(), unlockedPosition, 'unlocking does not move the lyric');
-  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词').isFocusable()), true);
+  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词').isFocusable()), true);
   await assertOverlayTopmost('unlocked');
   await overlay.getByRole('button', { name: '锁定', exact: true }).click();
-  await page.waitForFunction(() => window.slowTuneDesktop.getState().then(state => state.preferences.locked));
+  await page.waitForFunction(() => window.biBiMusicDesktop.getState().then(state => state.preferences.locked));
   await settings.getByRole('checkbox', { name: '锁定歌词（鼠标穿透）', exact: true }).uncheck();
-  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词').isFocusable()), true);
+  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词').isFocusable()), true);
   await application.evaluate(({ Tray }) => { const original = Tray.prototype.setContextMenu; globalThis.originalTrayMenu = original; Tray.prototype.setContextMenu = function(menu) { globalThis.reviewTrayMenu = menu; return original.call(this, menu); }; });
   await settings.getByRole('checkbox', { name: '锁定歌词（鼠标穿透）', exact: true }).check();
-  await page.waitForFunction(() => window.slowTuneDesktop.getState().then(state => state.preferences.locked));
-  assert.deepEqual(await application.evaluate(() => globalThis.reviewTrayMenu.items.filter(item => item.type !== 'separator').map(item => item.label)), ['打开慢听', '桌面歌词', '解锁歌词（恢复鼠标操作）', '重置歌词位置', '退出慢听']);
+  await page.waitForFunction(() => window.biBiMusicDesktop.getState().then(state => state.preferences.locked));
+  assert.deepEqual(await application.evaluate(() => globalThis.reviewTrayMenu.items.filter(item => item.type !== 'separator').map(item => item.label)), ['打开哔哔音乐', '桌面歌词', '解锁歌词（恢复鼠标操作）', '重置歌词位置', '退出哔哔音乐']);
   await application.evaluate(() => globalThis.reviewTrayMenu.items.find(item => item.label.startsWith('解锁歌词')).click());
-  await page.waitForFunction(() => window.slowTuneDesktop.getState().then(state => !state.preferences.locked));
+  await page.waitForFunction(() => window.biBiMusicDesktop.getState().then(state => !state.preferences.locked));
   await page.waitForFunction(() => ![...document.querySelectorAll('[data-settings-section="desktop-lyrics"] label')].find(label => label.textContent.includes('锁定歌词')).querySelector('input').checked);
   assert.equal(await settings.getByRole('checkbox', { name: '锁定歌词（鼠标穿透）', exact: true }).isChecked(), false, 'tray recovery also updates the settings panel');
   await application.evaluate(({ screen }) => { screen.getCursorScreenPoint = globalThis.originalLyricsCursor; delete globalThis.originalLyricsCursor; delete globalThis.lyricsCursor; });
@@ -393,14 +398,14 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   const actualTime = await page.locator('audio').evaluate(audio => audio.currentTime * 1000 - 1000);
   assert(Math.abs(Number(await overlay.locator('#current').getAttribute('data-time')) - actualTime) < 220, '2x playback uses actual media time while hidden');
   assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.webContents.getURL().startsWith('http:')).isMinimized()), true);
-  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词').isAlwaysOnTop()), true);
+  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词').isAlwaysOnTop()), true);
   await assertOverlayTopmost('main window minimized');
-  await page.evaluate(() => window.slowTuneDesktop.updateLyricsPreferences({ locked: true }));
+  await page.evaluate(() => window.biBiMusicDesktop.updateLyricsPreferences({ locked: true }));
   await assertOverlayTopmost('locked while main window minimized');
-  await page.evaluate(() => window.slowTuneDesktop.updateLyricsPreferences({ locked: false }));
+  await page.evaluate(() => window.biBiMusicDesktop.updateLyricsPreferences({ locked: false }));
   await assertOverlayTopmost('unlocked while main window minimized');
   await overlay.getByRole('button', { name: '下一首', exact: true }).click(); await overlay.getByText('下一首歌词', { exact: true }).waitFor();
-  await page.evaluate(sourceKey => window.slowTuneDesktop.publishClock({ sourceKey, position: 900, playing: true }), originalSource);
+  await page.evaluate(sourceKey => window.biBiMusicDesktop.publishClock({ sourceKey, position: 900, playing: true }), originalSource);
   await sleep(100); assert(Number(await overlay.locator('#current').getAttribute('data-time')) < 10000, 'late clock from the previous source is rejected');
   assert.equal(await page.locator('audio').count(), 1); assert.equal(fixture.preparations.length, preparations + 1);
   assert.equal(await page.evaluate(() => typeof window.require), 'undefined'); assert.equal(await overlay.evaluate(() => typeof window.require), 'undefined');
@@ -409,13 +414,13 @@ test('Windows integrated chrome, immersive and floating lyrics retain one player
   const saved = JSON.parse(readFileSync(join(data, 'desktop-state.json'), 'utf8'));
   assert.equal(saved.lyrics.visible, true); assert.equal(saved.lyrics.locked, false); assert.equal(saved.lyrics.fontSize, 34); assert.equal(saved.overlayBounds.x, 120); assert.equal(saved.overlayBounds.y, 140);
   application = await launch(); const restored = await windowAt(application, url => url.endsWith('/lyrics.html'));
-  assert.equal(await restored.evaluate(() => window.slowTuneLyrics.getState().then(state => state.preferences.fontSize)), 34);
-  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '慢听 · 桌面歌词').isVisible()), false, 'restoring without active lyrics keeps the native window hidden');
-  await restored.evaluate(() => window.slowTuneLyrics.updatePreferences({ visible: false }));
+  assert.equal(await restored.evaluate(() => window.biBiMusicLyrics.getState().then(state => state.preferences.fontSize)), 34);
+  assert.equal(await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find(window => window.getTitle() === '哔哔音乐 · 桌面歌词').isVisible()), false, 'restoring without active lyrics keeps the native window hidden');
+  await restored.evaluate(() => window.biBiMusicLyrics.updatePreferences({ visible: false }));
   await closeDesktop(application); application = undefined;
   assert.equal(JSON.parse(readFileSync(join(data, 'desktop-state.json'), 'utf8')).lyricsDefaultsVersion, 1);
   application = await launch(); const remembered = await windowAt(application, url => url.startsWith('http:'));
-  assert.equal(await remembered.evaluate(() => window.slowTuneDesktop.getState().then(state => state.preferences.visible)), false);
+  assert.equal(await remembered.evaluate(() => window.biBiMusicDesktop.getState().then(state => state.preferences.visible)), false);
   assert.equal(application.windows().some(page => page.url().endsWith('/lyrics.html')), false, 'manual close persists across restart');
   await remembered.getByRole('button', { name: '设置', exact: true }).click();
   await remembered.getByRole('navigation', { name: '设置分组', exact: true }).getByRole('button', { name: '本地资料', exact: true }).click();

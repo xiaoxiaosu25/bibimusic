@@ -78,7 +78,7 @@ test('adoption extracts preferences from the original IPv4 or localhost origin w
     const sourceConfig = join(original, 'config.local.json'), target = join(data, name);
     writeFileSync(sourceConfig, JSON.stringify({ host, allowedHosts, port: 41987, accessKey: 'isolated-adoption-test', userSpace: 'personal', database: 'library.sqlite', runtimeDirectory: 'runtime' }));
     await adoptDesktopData({ sourceConfig, oldProfile, target, serviceRoot: build, extractPreferences: async (stage, selectedOrigin) => {
-      await promisify(execFile)(electron, [join(root, 'desktop/adopt-preferences.mjs')], { env: { ...env, SLOWTUNE_ADOPT_DATA: stage, SLOWTUNE_ADOPT_ORIGIN: selectedOrigin }, windowsHide: true, timeout: 25000 });
+      await promisify(execFile)(electron, [join(root, 'desktop/adopt-preferences.mjs')], { env: { ...env, BIBIMUSIC_ADOPT_DATA: stage, BIBIMUSIC_ADOPT_ORIGIN: selectedOrigin }, windowsHide: true, timeout: 25000 });
     } });
     assert.deepEqual(new DesktopStorage(target).read(), preferences[origin], name + ' retains the original theme and queue');
   }

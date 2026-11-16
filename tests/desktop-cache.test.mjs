@@ -29,7 +29,7 @@ test('desktop reloads current HTML and assets from a persistent profile while re
     }
     response.setHeader('Cache-Control', 'public, max-age=86400');
     const script = request.url.match(/^\/assets\/index-(\d+)\.js$/);
-    if (script) { response.setHeader('Content-Type', 'text/javascript'); response.end(`document.body.dataset.build='${script[1]}';document.body.append('cached-client-${script[1]}');window.slowTuneDesktop.onCommand(command=>{if(command==='release')window.slowTuneDesktop.playbackReleased(true);});`); return; }
+    if (script) { response.setHeader('Content-Type', 'text/javascript'); response.end(`document.body.dataset.build='${script[1]}';document.body.append('cached-client-${script[1]}');window.biBiMusicDesktop.onCommand(command=>{if(command==='release')window.biBiMusicDesktop.playbackReleased(true);});`); return; }
     response.setHeader('Content-Type', 'text/html');
     response.end(`<!doctype html><html><body><script src="/assets/index-${version}.js"></script></body></html>`);
   });

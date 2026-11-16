@@ -7,7 +7,7 @@ import { Avatar } from './Avatar';
 import { RefreshButton } from './ListActions';
 
 export function BilibiliAccountControls({ status, onChange, onOpenAbout }: { status?: BilibiliAccountState; onChange: (status: BilibiliAccountState) => void; onOpenAbout?: () => void }) {
-  const desktop = !!window.slowTuneDesktop;
+  const desktop = !!window.biBiMusicDesktop;
   const [challenge, setChallenge] = useState<LoginChallenge>();
   const [qr, setQr] = useState('');
   const [phase, setPhase] = useState('');

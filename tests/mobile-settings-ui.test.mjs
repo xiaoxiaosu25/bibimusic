@@ -77,6 +77,9 @@ test('mobile settings have independent pages, working choices and stable Back, F
   await appearance.getByRole('button',{name:'欢迎页 背景图片与构图',exact:true}).click();
   const welcome=page.locator('[data-settings-section="welcome"]:visible');await welcome.waitFor();
   await welcome.locator('.welcome-preview-frame.mobile').waitFor();
+  assert.equal(await welcome.locator('.desktop-startup-preview').count(),0,'web settings retain their web entry preview');
+  await welcome.getByRole('checkbox',{name:'预览访问码表单',exact:true}).check();
+  assert.equal(await welcome.locator('.welcome-preview-frame .welcome-login').count(),1);
   await page.getByRole('button',{name:'返回上一级',exact:true}).click();await appearance.waitFor();
   await page.getByRole('button',{name:'返回上一级',exact:true}).click();await nav.waitFor();
   await page.getByRole('button',{name:'启动与访问 进入方式与访问码',exact:true}).click();

@@ -18,7 +18,7 @@ const references = [
 ];
 
 export function AboutPanel({ active, status }: { active: boolean; status?: ServerStatus }) {
-  const desktop = !!window.slowTuneDesktop;
+  const desktop = !!window.biBiMusicDesktop;
   const [notices, setNotices] = useState<Notices>();
   const [error, setError] = useState(false), [retry, setRetry] = useState(0);
   useEffect(() => {
@@ -36,7 +36,7 @@ export function AboutPanel({ active, status }: { active: boolean; status?: Serve
   const openSource = notices?.entries;
   return <div className="about-settings settings-stack">
     <header className="settings-section-heading">
-      <div><h3 tabIndex={-1} data-about-heading>关于与声明</h3><p className="muted">慢听 SlowTune · {desktop ? 'Windows 桌面个人音乐应用' : '个人音乐网页工具'}</p></div>
+      <div><h3 tabIndex={-1} data-about-heading>关于与声明</h3><p className="muted">哔哔音乐 BiBiMusic · {desktop ? 'Windows 桌面 B站音乐播放器' : 'B站音乐网页播放器'}</p></div>
       {(status?.version || notices?.appVersion) && <span className="settings-version">应用 {status?.version ?? notices?.appVersion}</span>}
     </header>
     <p className="muted">本应用为独立第三方工具，与哔哩哔哩、YouTube 及相关权利人无官方隶属或背书关系。</p>
@@ -68,7 +68,7 @@ export function AboutPanel({ active, status }: { active: boolean; status?: Serve
     <section className="settings-group" aria-labelledby="usage-disclosure-heading">
       <h4 id="usage-disclosure-heading">免责声明</h4>
       <ol className="disclaimer-list">
-        <li><strong>非官方项目。</strong>慢听为独立的第三方音乐工具，与哔哩哔哩、YouTube 及相关权利人无官方隶属、合作或背书关系。</li>
+        <li><strong>非官方项目。</strong>哔哔音乐为独立的第三方音乐工具，与哔哩哔哩、YouTube 及相关权利人无官方隶属、合作或背书关系。</li>
         <li><strong>内容版权。</strong>音视频、封面、评论和商标等内容的相关权利归相应权利人。本应用提供检索、资料管理与在线播放能力，不随应用分发第三方音视频文件，也不授予平台内容的使用、下载或传播许可。</li>
         <li><strong>使用范围。</strong>请在平台允许的访问与账号权限范围内使用，并遵守适用法律及平台服务条款。请勿用于侵权传播、未经许可的商业利用、恶意批量抓取或其他违法违规行为。</li>
         <li><strong>服务与账号风险。</strong>第三方接口可能变更、限流或停止服务，账号可能过期或受到平台限制；应用无法保证所有内容的可访问性、音质或持续可用性。重要资料请定期备份。</li>
@@ -86,14 +86,14 @@ export function AboutPanel({ active, status }: { active: boolean; status?: Serve
         <dt>{desktop ? '播放与界面偏好' : '当前浏览器'}</dt><dd>{desktop ? '播放队列、模式、音量及界面偏好保存在本应用的 data 中。播放进度不持久化；重新打开后需手动从头播放。' : '保存播放队列、播放模式、音量及部分界面偏好。播放进度不持久化；恢复浏览器队列后需手动从头播放。'}</dd>
         <dt>备份范围</dt><dd>当前 JSON 备份包含歌单、收藏及曲目资料和来源标识，不包含音视频文件、登录凭据、关注名单、推荐偏好、来源设置或收藏夹同步关联。</dd>
       </dl>
-      {desktop && <p className="muted">完整备份请先退出慢听，再复制整个 data 文件夹，包含资料库、设置、偏好和加密账号资料；歌单 JSON 只覆盖上列歌单资料，不是完整备份。</p>}
+      {desktop && <p className="muted">完整备份请先退出哔哔音乐，再复制整个 data 文件夹，包含资料库、设置、偏好和加密账号资料；歌单 JSON 只覆盖上列歌单资料，不是完整备份。</p>}
       <p className="muted">{desktop ? '搜索与播放会向相应平台或内容分发服务发起请求。本应用的内部连接仅供本机使用。' : '搜索与播放会向相应平台或内容分发服务发起请求。局域网 HTTP 连接不具备 HTTPS 的传输保护，请只在可信设备和网络中使用。'}</p>
-      <p className="muted">{desktop ? '关闭主窗口或选择“退出慢听”会停止播放，等待必要保存并关闭本应用的内部服务；最小化可继续播放。退出应用保留B站登录，要删除凭据请到“B站账号”退出。' : '退出当前浏览器登录只结束该浏览器的服务访问会话，服务端B站登录仍保留。要移除该登录，请到“B站账号”退出。'}</p>
+      <p className="muted">{desktop ? '关闭主窗口或选择“退出哔哔音乐”会停止播放，等待必要保存并关闭本应用的内部服务；最小化可继续播放。退出应用保留B站登录，要删除凭据请到“B站账号”退出。' : '退出当前浏览器登录只结束该浏览器的服务访问会话，服务端B站登录仍保留。要移除该登录，请到“B站账号”退出。'}</p>
     </section>
 
     <section className="settings-group" aria-labelledby="licenses-heading">
       <h4 id="licenses-heading">开源软件与第三方材料</h4>
-      {desktop && <p className="muted">慢听及随附自有公共包的原创代码按 AGPL-3.0-only 提供，不作担保；允许按许可证修改与再分发。<a className="settings-text-link" href="/legal/PROJECT-LICENSE.txt" download="slowtune-LICENSE.txt">项目许可证</a> · <a className="settings-text-link" href="/legal/PROJECT-NOTICE.txt" download="slowtune-NOTICE.txt">版权与范围</a> · <a className="settings-text-link" href="/legal/desktop-lyrics-source.tar.gz" download="slowtune-source.tar.gz">本构建对应源码</a>。第三方材料保留各自许可。</p>}
+      {desktop && <p className="muted">哔哔音乐及随附自有公共包的原创代码按 AGPL-3.0-only 提供，不作担保；允许按许可证修改与再分发。<a className="settings-text-link" href="/legal/PROJECT-LICENSE.txt" download="bibimusic-LICENSE.txt">项目许可证</a> · <a className="settings-text-link" href="/legal/PROJECT-NOTICE.txt" download="bibimusic-NOTICE.txt">版权与范围</a> · <a className="settings-text-link" href="/legal/desktop-lyrics-source.tar.gz" download="bibimusic-source.tar.gz">本构建对应源码</a>。第三方材料保留各自许可。</p>}
       <p className="muted">感谢第三方项目的贡献。下方清单按当前安装的运行依赖和随应用提供的字体生成，保留原版权与许可文本，可离线阅读；外部项目链接需要网络。</p>
       {!notices && !error && <p role="status">正在读取随应用提供的许可清单…</p>}
       {error && <div className="feedback" data-tone="error" role="alert"><p>许可清单读取失败，请重试或下载随应用提供的许可文件。</p><Button variant="secondary"  onClick={() => setRetry(value => value + 1)}>重新读取许可清单</Button></div>}
@@ -106,7 +106,7 @@ export function AboutPanel({ active, status }: { active: boolean; status?: Serve
           </details>
         </li>)}</ul>
       </details>}
-      <a className="btn btn-secondary" href="/legal/THIRD-PARTY-NOTICES.txt" download="slow-listening-third-party-notices.txt">下载第三方许可全文</a>
+      <a className="btn btn-secondary" href="/legal/THIRD-PARTY-NOTICES.txt" download="bibimusic-third-party-notices.txt">下载第三方许可全文</a>
       <details className="settings-details"><summary>yt-dlp 等外部工具许可</summary>
         <p>yt-dlp、其 EJS 依赖及运行环境{desktop ? '需要在本机另行配置' : '由服务宿主提供'}，未随本应用分发。yt-dlp 的源码与不同可执行发行物可能适用不同许可；应以实际安装版本和发行物所附许可为准。</p>
         <p className="muted">{status?.providers.youtube.toolVersion ? `当前${desktop ? '本机' : '服务'}报告 yt-dlp ${status.providers.youtube.toolVersion}。` : '当前未取得 yt-dlp 工具版本。'} <a href="https://github.com/yt-dlp/yt-dlp#licensing" target="_blank" rel="noreferrer">查看 yt-dlp 上游许可说明</a></p>

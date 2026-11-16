@@ -119,7 +119,7 @@ if (import.meta.main) {
   await stopDesktopForRestart({ root, data: oldProfile, electron, environment: process.env });
   await stopServiceForRestart(serviceRoot, sourceConfig, root);
   const result = await adoptDesktopData({ sourceConfig, oldProfile, target, serviceRoot, extractPreferences: async (data, origin) => {
-    const env = { ...process.env, SLOWTUNE_ADOPT_DATA: data, SLOWTUNE_ADOPT_ORIGIN: origin }; delete env.ELECTRON_RUN_AS_NODE; delete env.NODE_OPTIONS;
+    const env = { ...process.env, BIBIMUSIC_ADOPT_DATA: data, BIBIMUSIC_ADOPT_ORIGIN: origin }; delete env.ELECTRON_RUN_AS_NODE; delete env.NODE_OPTIONS;
     await run(electron, [join(root, 'desktop/adopt-preferences.mjs')], { env, windowsHide: true, timeout: 45000, maxBuffer: 65536 });
   } });
   if (previousStartup) renameSync(previousStartup, join(target, 'backups/initial/previous-startup'));

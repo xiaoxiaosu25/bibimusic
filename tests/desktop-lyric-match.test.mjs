@@ -45,7 +45,7 @@ test('desktop resolves the reported source and alias-only records; genuine ambig
     t.after(() => { provider.dispose(); store.close(); });
     const app = createLyricsRouter(store, provider, () => 'matching');
     const ref = { provider: 'bilibili', kind: 'video', id: 'BV1hRnJ6fE3K', part: '1' };
-    const response = await app.request('http://localhost/resolve', { method: 'POST', headers: { 'X-Music-App': '1', 'Content-Type': 'application/json', ...(desktop ? { 'X-SlowTune-Surface': 'desktop' } : {}) }, body: JSON.stringify({ ref, durationSeconds: 253, ...query }) });
+    const response = await app.request('http://localhost/resolve', { method: 'POST', headers: { 'X-Music-App': '1', 'Content-Type': 'application/json', ...(desktop ? { 'X-BiBiMusic-Surface': 'desktop' } : {}) }, body: JSON.stringify({ ref, durationSeconds: 253, ...query }) });
     assert.equal(response.status, 200);
     return response.json();
   };

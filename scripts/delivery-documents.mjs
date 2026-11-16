@@ -10,7 +10,7 @@ export const deliveryDocuments = [
 export function copyDeliveryDocuments(root, target) {
   root = resolve(root); target = resolve(target);
   const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
-  const repository = (typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url) ?? 'https://github.com/xiaoxiaosu25/slowtune';
+  const repository = (typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url) ?? 'https://github.com/xiaoxiaosu25/bibimusic';
   const base = repository.replace(/^git\+/, '').replace(/\.git$/, '') + '/blob/main/';
   const documents = deliveryDocuments.filter(file => existsSync(join(root, file)));
   for (const file of documents) {
@@ -24,8 +24,8 @@ export function copyDeliveryDocuments(root, target) {
     '', `开发与贡献说明见[在线源码](${base}CONTRIBUTING.md)。源码链接仅适用于源码工作区；运行包中的开发参考链接指向在线源码。`, '',
   ].join('\n'));
   writeFileSync(join(target, 'README.md'), [
-    '# 慢听运行文件', '',
-    'Windows 桌面版请从完整免安装目录双击 SlowTune.exe；程序自己的 data 目录用于保存资料。',
+    '# 哔哔音乐运行文件', '',
+    'Windows 桌面版请从完整免安装目录双击 BiBiMusic.exe；程序自己的 data 目录用于保存资料。',
     '服务版需要兼容的 Node.js，在本目录安装生产依赖、建立私人配置后启动：', '',
     '```powershell', 'npm ci --omit=dev --ignore-scripts', 'node scripts/launch.mjs --no-open', '```', '',
     '运行与备份见[文档导航](docs/文档导航.md)，许可见[LICENSE](LICENSE)和[第三方声明](第三方声明.md)。',

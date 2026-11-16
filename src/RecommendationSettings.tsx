@@ -66,7 +66,7 @@ export function RecommendationSettings({ onChanged, accountAuthenticated = false
     </header>
     <div className="recommendation-column">
       <label className="field"><span className="field-label">这些偏好用在哪个栏目？</span><select className="select" aria-label="推荐栏目" value={column} onChange={e => setSelectedColumn(e.target.value)}>{Object.entries(labels).filter(([id])=>id!=='youtube-music-selection'||youtubeEnabled).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></label>
-      <p className="muted"><span>每个栏目单独设置</span><span>{window.slowTuneDesktop?'保存在本桌面应用的 data 中，与服务版各自保存':'同一服务的电脑和手机共用'}</span></p>
+      <p className="muted"><span>每个栏目单独设置</span><span>{window.biBiMusicDesktop?'保存在本桌面应用的 data 中，与服务版各自保存':'同一服务的电脑和手机共用'}</span></p>
     </div>
     {!state && !message && <p className="loading" role="status">正在读取推荐偏好…</p>}
     {state && <>

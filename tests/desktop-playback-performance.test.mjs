@@ -117,7 +117,7 @@ test('desktop bridge negotiates one optimized protocol prepare and carries timeo
   globalThis.window={matchMedia:()=>({matches:desktop}),dispatchEvent:()=>{}};
   globalThis.fetch=async(input,options)=>{
     const path=new URL(input).pathname,headers=new Headers(options.headers),body=options.body?JSON.parse(options.body):undefined;calls.push({path,headers,body});
-    if(path==='/v1/handshake')return Response.json({protocol:2,capabilities:[{provider:'bilibili',operations:['metadata','formats','prepare','slowtune-desktop-audio'],anonymous:true,limitations:[]}]});
+    if(path==='/v1/handshake')return Response.json({protocol:2,capabilities:[{provider:'bilibili',operations:['metadata','formats','prepare','bibimusic-desktop-audio'],anonymous:true,limitations:[]}]});
     if(path==='/v1/call/metadata')return Response.json({protocol:2,result:entry});
     if(path==='/v1/call/formats')return Response.json({protocol:2,result:[format]});
     if(path==='/v1/call/prepare')return Response.json({protocol:2,result:{...playback,delivery:{url:'http://fixture/media',requiresHost:false}}});
@@ -129,12 +129,12 @@ test('desktop bridge negotiates one optimized protocol prepare and carries timeo
     const source=await bridge.sourceFrom({...entry,verifiedAudio:{ref,format,preparationToken:'a'.repeat(32)}}),plan=await source.prepare({signal:signal()});
     assert.deepEqual(plan.timeouts,{resolve:60,initial:30,stall:30});
     let prepares=calls.filter(call=>call.path==='/v1/call/prepare');assert.equal(prepares.length,1);assert.equal(calls.filter(call=>call.path==='/v1/call/formats').length,0);
-    assert.equal(prepares[0].headers.get('X-SlowTune-Preparation'),'a'.repeat(32));assert.equal(prepares[0].body.request.slowTuneDesktopAudio,undefined);
+    assert.equal(prepares[0].headers.get('X-BiBiMusic-Preparation'),'a'.repeat(32));assert.equal(prepares[0].body.request.biBiMusicDesktopAudio,undefined);
     const refreshed=await bridge.resolver.resolveUrl(source.resourceId,plan,'retry',{signal:signal()});assert.deepEqual(refreshed.timeouts,plan.timeouts);
     await bridge.dispose();desktop=false;calls.length=0;
     bridge=new browserModules.BestAudioBridge(client,{canPlayType:()=> 'probably'});const mobile=await bridge.sourceFrom(entry),mobilePlan=await mobile.prepare({signal:signal()});
     assert.equal(mobilePlan.timeouts,undefined);assert.equal(calls.filter(call=>call.path==='/v1/call/formats').length,1);
-    prepares=calls.filter(call=>call.path==='/v1/call/prepare');assert.equal(prepares[0].headers.has('X-SlowTune-Surface'),false);assert.equal(prepares[0].headers.has('X-SlowTune-Audio-Support'),false);
+    prepares=calls.filter(call=>call.path==='/v1/call/prepare');assert.equal(prepares[0].headers.has('X-BiBiMusic-Surface'),false);assert.equal(prepares[0].headers.has('X-BiBiMusic-Audio-Support'),false);
   }finally{await bridge?.dispose();client?.dispose();globalThis.window=originalWindow;globalThis.fetch=originalFetch;}
 });
 import {mp4Prefix} from './fixtures/audio-prefix.mjs';

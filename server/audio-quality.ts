@@ -7,7 +7,7 @@ export { audioSupportFormats, supportedAudioTypes, supportsAudioType, losslessAu
 export interface VerifiedAudio { ref: EntryRef; format: AudioFormat; preparationToken?: string;selection?:AudioSelection }
 export interface VerifiedMusicEntry extends MusicEntry { verifiedAudio?: VerifiedAudio }
 export interface PlaybackFailureFact {attempt:number;state:'pending'|'ready'|'complete'|'failed';code?:string;status?:number;retryAfterMs?:number;provider?:'bilibili'}
-export const desktopAudioCapability = 'slowtune-desktop-audio';
+export const desktopAudioCapability = 'bibimusic-desktop-audio';
 export interface DesktopAudioApi extends MusicApi {
   prepareDesktopAudio?(request: PrepareRequest, options: CallOptions | undefined, support: string[], preparationToken?: string,selection?:AudioSelection): ReturnType<MusicApi['prepare']>;
   playbackFailure?(leaseId:string,options?:CallOptions):Promise<PlaybackFailureFact|null>;

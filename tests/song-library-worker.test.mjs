@@ -44,20 +44,20 @@ test('desktop worker shares the real database, validates edits, and preserves CA
 test('desktop HTTP uses the worker without changing response, origin, revision or mobile contracts', async t => {
   const { store, service } = await setup(t);
   const router = createSongLibraryRouter(service, () => 'owner');
-  const post = (revision, edits, surface = 'desktop') => router.request('/edits', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Music-App': '1', 'X-SlowTune-Surface': surface }, body: JSON.stringify({ revision, edits }) });
+  const post = (revision, edits, surface = 'desktop') => router.request('/edits', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Music-App': '1', 'X-BiBiMusic-Surface': surface }, body: JSON.stringify({ revision, edits }) });
   const created = await post(null, [{ type: 'create-song', id: 's', title: 'From desktop' }]);
   assert.equal(created.status, 200);
   const state = await created.json();
-  assert.deepEqual(await (await router.request('/', { headers: { 'X-SlowTune-Surface': 'desktop' } })).json(), state);
+  assert.deepEqual(await (await router.request('/', { headers: { 'X-BiBiMusic-Surface': 'desktop' } })).json(), state);
   const mobile = await post(state.revision, [{ type: 'edit-song', songId: 's', title: 'Mobile' }], 'mobile');
   assert.equal(mobile.status, 200);
   const stale = await post(state.revision, [{ type: 'edit-song', songId: 's', title: 'Stale' }]);
   assert.equal(stale.status, 409);
   assert.equal((await stale.json()).error.currentRevision, store.revision());
-  const exported=await router.request('/export',{headers:{'X-SlowTune-Surface':'desktop'}});
-  assert.equal(exported.status,200);assert.match(exported.headers.get('Content-Disposition'),/slowtune-library.json/);
+  const exported=await router.request('/export',{headers:{'X-BiBiMusic-Surface':'desktop'}});
+  assert.equal(exported.status,200);assert.match(exported.headers.get('Content-Disposition'),/bibimusic-library.json/);
   assert.deepEqual(await exported.json(),JSON.parse(service.export()));
-  assert.equal((await router.request('/', { headers: { Origin: 'https://foreign.invalid', 'X-SlowTune-Surface': 'desktop' } })).status, 403);
+  assert.equal((await router.request('/', { headers: { Origin: 'https://foreign.invalid', 'X-BiBiMusic-Surface': 'desktop' } })).status, 403);
 });
 
 test('large desktop edits leave the host responsive; cancellation drains without committing and admission stays bounded', { timeout: 30000 }, async t => {
@@ -115,9 +115,9 @@ test('file import tokens remain valid when the same session changes its surface'
   const {service}=await setup(t),router=createSongLibraryRouter(service,()=> 'one');
   service.execute(null,[{type:'create-song',id:'s',title:'Preserved'}]);
   for(const surface of ['desktop','mobile']){
-    const previewResponse=await router.request('/imports/preview?mode=append',{method:'POST',headers:{'X-Music-App':'1','X-SlowTune-Surface':surface,'X-SlowTune-Revision':service.revision()},body:service.export()});
+    const previewResponse=await router.request('/imports/preview?mode=append',{method:'POST',headers:{'X-Music-App':'1','X-BiBiMusic-Surface':surface,'X-BiBiMusic-Revision':service.revision()},body:service.export()});
     assert.equal(previewResponse.status,200);const preview=await previewResponse.json();
-    const committed=await router.request('/imports/commit',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-SlowTune-Surface':surface==='desktop'?'mobile':'desktop'},body:JSON.stringify({token:preview.token,revision:preview.revision})});
+    const committed=await router.request('/imports/commit',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-BiBiMusic-Surface':surface==='desktop'?'mobile':'desktop'},body:JSON.stringify({token:preview.token,revision:preview.revision})});
     assert.equal(committed.status,200);assert.equal((await committed.json()).snapshot.songs[0].title,'Preserved');
   }
 });

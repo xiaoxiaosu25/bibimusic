@@ -35,7 +35,9 @@ test('Product HTTP authentication, conditional transactions, failed import/stora
     assert.equal((await req('/api/song-library/sync/preview',{revision:null,link:{create:{title:'音乐',private:true},targetId:'new'}})).status,400);
     assert.equal((await req('/api/comments?provider=youtube&id=invalid')).status,400);
     assert.equal((await req('/api/comments',{})).status,405);
-    assert.equal((await req('/api/status')).data.providers.youtube.available,false);
+    const status=(await req('/api/status')).data;
+    assert.equal(status.providers.youtube.available,false);
+    assert.deepEqual(status.brand,{name:'哔哔音乐',english:'BiBiMusic',id:'bibimusic',tagline:'发现 B站音乐，收藏喜欢的版本。'});
     const sourceSettings=(await req('/api/settings/sources')).data;
     assert.equal(sourceSettings.youtube.enabled,false);assert.equal(sourceSettings.youtube.disabledDisplay,'dim');
     assert.equal((await req('/api/settings/sources',{revision:sourceSettings.revision,youtube:{enabled:'yes',disabledDisplay:'dim'}})).status,400);
@@ -68,7 +70,7 @@ test('Product HTTP authentication, conditional transactions, failed import/stora
     assert.deepEqual(responses.map(r=>r.status).sort(),[200,409]);const original=(await req('/api/song-library')).data;assert.equal(original.snapshot.playlists.length,1);
     const db=new DatabaseSync(config.database+'.song-library.sqlite');db.exec('BEGIN IMMEDIATE');try{const failed=await req('/api/song-library/edits',{revision:original.revision,edits:[{type:'create-playlist',name:'blocked'}]});assert.equal(failed.status,503);assert.equal(failed.data.error.code,'storage');}finally{db.exec('ROLLBACK');db.close();}
     assert.deepEqual((await req('/api/song-library')).data,original);
-    for(const value of ['broken',{...original.snapshot,version:999},{...original.snapshot,cookie:'forbidden'}]){assert.equal((await req('/api/song-library/imports/preview?mode=replace',value,{'X-SlowTune-Revision':original.revision})).status,400);assert.deepEqual((await req('/api/song-library')).data,original);}
+    for(const value of ['broken',{...original.snapshot,version:999},{...original.snapshot,cookie:'forbidden'}]){assert.equal((await req('/api/song-library/imports/preview?mode=replace',value,{'X-BiBiMusic-Revision':original.revision})).status,400);assert.deepEqual((await req('/api/song-library')).data,original);}
     await stop();await start();assert.equal((await req('/api/song-library')).status,401);assert.equal((await req('/api/settings/search')).status,401);assert.equal((await req('/api/search',{provider:'bilibili',query:'music'})).status,401);assert.equal((await req('/api/search/resolve',{title:'music'})).status,401);await login();assert.deepEqual((await req('/api/song-library')).data,original);assert.deepEqual((await req('/api/settings/search')).data,searchSaved);await stop();
   }finally{if(child?.exitCode===null)child.kill();}
 });

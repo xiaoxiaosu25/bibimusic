@@ -9,7 +9,7 @@ import { copyDeliveryDocuments } from './delivery-documents.mjs';
 
 if (process.platform !== 'win32') throw new Error('当前桌面交付只支持 Windows 构建与验证。');
 const root = fileURLToPath(new URL('..', import.meta.url)), app = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
-const label = `slowtune-desktop-${app.version}-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+const label = `bibimusic-desktop-${app.version}-${new Date().toISOString().replace(/[:.]/g, '-')}`;
 const locations = developmentPaths(root);
 const stage = join(locations.build, 'desktop-packaging', label), output = join(locations.artifacts, label);
 mkdirSync(stage, { recursive: true }); mkdirSync(dirname(output), { recursive: true }); mkdirSync(output, { recursive: false });
@@ -37,12 +37,12 @@ else {
   if (!license.includes('Node.js') || !license.includes('MIT')) throw new Error('Node 许可材料格式异常。');
   writeFileSync(join(runtime, 'LICENSE.txt'), license);
 }
-const icon = join(stage, 'slowtune.ico'); writeFileSync(icon, iconIco());
-const paths = await packager({ dir: application, out: output, name: 'SlowTune', executableName: 'SlowTune', platform: 'win32', arch: process.arch, electronVersion: app.devDependencies.electron, appVersion: app.version, asar: true, icon, extraResource: [service, runtime], overwrite: false, prune: false, win32metadata: { CompanyName: 'SlowTune', FileDescription: '慢听桌面播放器', ProductName: '慢听 SlowTune' } });
+const icon = join(stage, 'bibimusic.ico'); writeFileSync(icon, iconIco());
+const paths = await packager({ dir: application, out: output, name: 'BiBiMusic', executableName: 'BiBiMusic', platform: 'win32', arch: process.arch, electronVersion: app.devDependencies.electron, appVersion: app.version, asar: true, icon, extraResource: [service, runtime], overwrite: false, prune: false, win32metadata: { CompanyName: 'BiBiMusic', FileDescription: '哔哔音乐桌面播放器', ProductName: '哔哔音乐 BiBiMusic' } });
 const packaged = paths[0];
-writeFileSync(join(packaged, '使用说明.txt'), '慢听 SlowTune Windows 桌面版\r\n\r\n双击 SlowTune.exe，在同一窗口显示欢迎页并自动进入，无需选择配置、输入访问码或另装 Node。重复打开唤起原窗口。\r\n所有资料与偏好位于 EXE 同级 data；更新程序时保留它，完整备份请先退出再复制整个 data。请放在当前用户可写的位置。\r\n设置 → 本地资料可打开资料和日志文件夹，或使用歌单备份恢复。换电脑或 Windows 用户后，B站账号可能需要重新登录。\r\n桌面与服务版独立运行，各自保存资料。关闭主窗口或退出慢听会停止自己的内部进程；最小化继续播放。\r\n更多播放选项 → 桌面悬浮歌词；托盘可开关、解锁和重置位置。\r\n当前不包含自动更新、签名或独立移动应用。YouTube 默认关闭，启用需另外配置取源工具。\r\n');
-writeFileSync(join(packaged, 'desktop-delivery.json'), JSON.stringify({ product: 'SlowTune', version: app.version, electron: app.devDependencies.electron, node: process.versions.node, platform: process.platform, arch: process.arch, unsigned: true }, null, 2) + '\n');
+writeFileSync(join(packaged, '使用说明.txt'), '哔哔音乐 BiBiMusic Windows 桌面版\r\n\r\n双击 BiBiMusic.exe，在同一窗口显示欢迎页并自动进入，无需选择配置、输入访问码或另装 Node。重复打开唤起原窗口。\r\n所有资料与偏好位于 EXE 同级 data；更新程序时保留它，完整备份请先退出再复制整个 data。请放在当前用户可写的位置。\r\n设置 → 本地资料可打开资料和日志文件夹，或使用歌单备份恢复。换电脑或 Windows 用户后，B站账号可能需要重新登录。\r\n桌面与服务版独立运行，各自保存资料。关闭主窗口或退出哔哔音乐会停止自己的内部进程；最小化继续播放。\r\n更多播放选项 → 桌面悬浮歌词；托盘可开关、解锁和重置位置。\r\n当前不包含自动更新、签名或独立移动应用。YouTube 默认关闭，启用需另外配置取源工具。\r\n');
+writeFileSync(join(packaged, 'desktop-delivery.json'), JSON.stringify({ product: 'BiBiMusic', version: app.version, electron: app.devDependencies.electron, node: process.versions.node, platform: process.platform, arch: process.arch, unsigned: true }, null, 2) + '\n');
 const zip = join(output, basename(packaged) + '.zip');
 const psQuote = value => "'" + value.replaceAll("'", "''") + "'";
 execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', `Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory(${psQuote(packaged)}, ${psQuote(zip)}, [System.IO.Compression.CompressionLevel]::Fastest, $true)`], { windowsHide: true, stdio: 'inherit' });
-console.log(JSON.stringify({ executable: join(packaged, 'SlowTune.exe'), zip }));
+console.log(JSON.stringify({ executable: join(packaged, 'BiBiMusic.exe'), zip }));

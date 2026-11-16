@@ -1,1 +1,1 @@
-export const brand = { name: '慢听', english: 'SlowTune', id: 'slowtune', tagline: '发现声音，把喜欢留在这里。' } as const;
+export const brand = { name: '哔哔音乐', english: 'BiBiMusic', id: 'bibimusic', tagline: '发现 B站音乐，收藏喜欢的版本。' } as const;

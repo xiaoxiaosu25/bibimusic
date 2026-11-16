@@ -39,8 +39,8 @@ export function SongBackupPanel({ library, onCommitted }: { library: SongLibrary
   };
   return <div className="backup-settings settings-stack" aria-busy={busy}>
     {saved&&<p className="feedback" role="status">{saved}</p>}
-    <p className="muted">{desktopSurface() ? '保存歌曲资料、全部版本、收藏和歌单成员及顺序，以及自定义收藏／歌单封面图片。只支持慢听新格式，上限 64 MiB；不包含音视频、凭据或账号同步权限。' : '保存歌曲资料、全部版本、收藏和歌单成员及顺序。只支持慢听新格式，上限 64 MiB；不包含媒体、凭据或账号同步权限。'}</p>
-    <section className="settings-group"><h3>导出歌曲资料库</h3><a className="btn btn-secondary" href="/api/song-library/export" download="slowtune-library.json">导出 JSON 快照</a></section>
+    <p className="muted">{desktopSurface() ? '保存歌曲资料、全部版本、收藏和歌单成员及顺序，以及自定义收藏／歌单封面图片。只支持哔哔音乐新格式，上限 64 MiB；不包含音视频、凭据或账号同步权限。' : '保存歌曲资料、全部版本、收藏和歌单成员及顺序。只支持哔哔音乐新格式，上限 64 MiB；不包含媒体、凭据或账号同步权限。'}</p>
+    <section className="settings-group"><h3>导出歌曲资料库</h3><a className="btn btn-secondary" href="/api/song-library/export" download="bibimusic-library.json">导出 JSON 快照</a></section>
     <section className="settings-group"><h3>从备份恢复</h3>
       <label className="field"><span className="field-label">选择快照文件</span><input ref={fileInput} className="input" type="file" accept="application/json,.json" disabled={busy} onChange={async event => {
         const file = event.target.files?.[0], generation = ++serial.current; setPreview(undefined); setAcknowledged(false); setDraft(''); setError('');setSaved(''); if (!file) return;

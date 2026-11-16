@@ -1,6 +1,6 @@
 import { currentLines, hasDisplayableLyrics } from './model.mjs';
 import { floatingLineEnd, floatingLinePan } from './lyric-layout.mjs';
-const api = window.slowTuneLyrics;
+const api = window.biBiMusicLyrics;
 const current = document.querySelector('#current'), secondary = document.querySelector('#secondary');
 const options = document.querySelector('#options'), panel = document.querySelector('#display-options');
 const unlock = document.querySelector('#unlock'), fontSize = document.querySelector('#font-size'), feedback = document.querySelector('#feedback');

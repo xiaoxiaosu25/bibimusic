@@ -4,7 +4,7 @@ const subscribe = (channel, callback) => {
   ipcRenderer.on(channel, listener);
   return () => ipcRenderer.removeListener(channel, listener);
 };
-contextBridge.exposeInMainWorld('slowTuneLyrics', {
+const lyricsAPI = {
   getState: () => ipcRenderer.invoke('desktop:state'),
   updatePreferences: value => ipcRenderer.invoke('desktop:preferences', value),
   command: value => ipcRenderer.send('desktop:command', value),
@@ -17,4 +17,5 @@ contextBridge.exposeInMainWorld('slowTuneLyrics', {
   onState: callback => subscribe('desktop:state', callback),
   onDocument: callback => subscribe('desktop:document', callback),
   onClock: callback => subscribe('desktop:clock', callback),
-});
+};
+contextBridge.exposeInMainWorld('biBiMusicLyrics', lyricsAPI);

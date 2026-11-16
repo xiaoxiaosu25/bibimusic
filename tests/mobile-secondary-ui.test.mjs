@@ -24,11 +24,11 @@ async function assertPosition(page,saved) {
   await page.waitForFunction(()=>![...document.querySelectorAll('.main-content .loading')].some(element=>element.getClientRects().length));
   try {await page.waitForFunction(y=>Math.abs(scrollY-y)<3,saved);}
   catch(error) {
-    const actual=await page.evaluate(()=>({scroll:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,history:history.state?.slowTuneMobileNavigation,focused:document.activeElement?.getAttribute('aria-label')}));
+    const actual=await page.evaluate(()=>({scroll:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,history:history.state?.biBiMusicMobileNavigation,focused:document.activeElement?.getAttribute('aria-label')}));
     throw new Error('Scroll restoration did not retain '+saved+': '+JSON.stringify(actual),{cause:error});
   }
 }
-async function readAt(page,y,action) {await page.evaluate(y=>scrollTo(0,y),y);if(action)await action.scrollIntoViewIfNeeded();const saved=await position(page);await page.waitForFunction(y=>history.state?.slowTuneMobileNavigation?.scroll===y,saved);return saved;}
+async function readAt(page,y,action) {await page.evaluate(y=>scrollTo(0,y),y);if(action)await action.scrollIntoViewIfNeeded();const saved=await position(page);await page.waitForFunction(y=>history.state?.biBiMusicMobileNavigation?.scroll===y,saved);return saved;}
 async function startAudio(page) {
   await page.locator('.mobile-mini-player').getByRole('button',{name:'播放',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('audio')?.currentTime>0);
@@ -115,7 +115,7 @@ test('follow searches restore author and collection context across layout transi
     else await page.getByRole('button',{name:'打开合集 散步歌单 2 · 合集',exact:true}).waitFor();
     await page.setViewportSize({width:390,height:844});
     await page.waitForFunction(()=>document.querySelector('.app')?.dataset.layout==='mobile');
-    const view=await page.evaluate(()=>JSON.parse(decodeURIComponent(history.state.slowTuneMobileNavigation.page.slice(8))));
+    const view=await page.evaluate(()=>JSON.parse(decodeURIComponent(history.state.biBiMusicMobileNavigation.page.slice(8))));
     assert.equal(view.selected.id,fixture.creators[0].id);
     assert.equal(view.collection?.id,collection?fixture.collections[1].id:undefined);
   }

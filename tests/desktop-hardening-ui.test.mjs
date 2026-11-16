@@ -24,11 +24,28 @@ test('desktop disclosures, native diagnostic copy, failed save recovery and imme
   let page = await launch(); const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.getByRole('button', { name: '设置', exact: true }).click();
   const nav = page.getByRole('navigation', { name: '设置分组' });
+  const welcome = page.locator('.welcome-settings'), preview = welcome.locator('.desktop-startup-preview');
+  await preview.waitFor();
+  assert.equal(await welcome.locator('.welcome-card').count(), 0, 'desktop settings preview the local splash instead of the web entry card');
+  assert.equal(await welcome.getByRole('checkbox', { name: '预览访问码表单', exact: true }).count(), 0);
+  assert.equal(await welcome.getByLabel('电脑欢迎面板位置', { exact: true }).count(), 0);
+  const frameBounds = await welcome.locator('.welcome-preview-frame').boundingBox(), stackBounds = await preview.locator('.startup-stack').boundingBox();
+  assert(Math.abs(stackBounds.x + stackBounds.width / 2 - frameBounds.x - frameBounds.width / 2) < 2, 'the splash brand stays centered in its preview frame');
+  await welcome.getByRole('button', { name: '纯色', exact: true }).click();
+  for (const [name, color] of [['黑夜', 'rgb(22, 21, 20)'], ['白天', 'rgb(245, 242, 235)']]) {
+    await welcome.getByRole('group', { name: '预览主题', exact: true }).getByRole('button', { name, exact: true }).click();
+    assert.equal(await preview.evaluate(element => getComputedStyle(element).backgroundColor), color, 'preview theme is independent of the host theme');
+  }
+  await welcome.getByLabel('上传欢迎图', { exact: true }).setInputFiles(join(root, 'public/assets/welcome-listening-desk.png'));
+  await page.waitForFunction(() => document.querySelector('.desktop-startup-preview .startup-background')?.getAttribute('src')?.startsWith('data:image/webp;'));
+  await welcome.getByRole('button', { name: '取消修改', exact: true }).click();
+  assert.equal(await page.locator('html').getAttribute('data-desktop-mode'), 'standard', 'editing the preview never switches native window chrome to startup mode');
+  await welcome.locator('.welcome-preview-frame').screenshot({ path: join(data, 'desktop-welcome-preview.png'), animations: 'disabled' });
   await nav.getByRole('button', { name: '关于与声明', exact: true }).click();
   const about = page.locator('[data-settings-section="about"]');
-  assert.match(await about.innerText(), /Windows 桌面个人音乐应用/);
+  assert.match(await about.innerText(), /Windows 桌面 B站音乐播放器/);
   assert.match(await about.innerText(), /退出应用保留B站登录/);
-  assert.doesNotMatch(await about.innerText(), /个人音乐网页工具|当前提供网页产品|连接同一个服务的电脑和手机|退出当前浏览器登录|局域网 HTTP/);
+  assert.doesNotMatch(await about.innerText(), /B站音乐网页播放器|当前提供网页产品|连接同一个服务的电脑和手机|退出当前浏览器登录|局域网 HTTP/);
   await nav.getByRole('button', { name: '音乐来源', exact: true }).click();
   assert.doesNotMatch(await page.locator('[data-settings-section="sources"]').innerText(), /电脑和手机共用|服务电脑上的/);
   await nav.getByRole('button', { name: 'B站账号', exact: true }).click();
@@ -59,13 +76,13 @@ test('desktop disclosures, native diagnostic copy, failed save recovery and imme
   const failedCopy = await application.evaluate(({ clipboard }) => clipboard.readText());
   assert.match(failedCopy, /保留上次信息/); assert.match(failedCopy, /最近操作错误：network/); assert(!failedCopy.includes('PRIVATE'));
   // An isolated directory at the temporary-file location forces a real disk error.
-  await page.evaluate(() => window.slowTuneDesktop.flushPreferences());
+  await page.evaluate(() => window.biBiMusicDesktop.flushPreferences());
   mkdirSync(join(data, 'preferences.json.tmp'));
-  await page.evaluate(() => window.slowTuneDesktop.writePreference('slow-listening:hardening:v1', 'unsaved').catch(() => {}));
+  await page.evaluate(() => window.biBiMusicDesktop.writePreference('slow-listening:hardening:v1', 'unsaved').catch(() => {}));
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor();
   assert.equal(JSON.parse(readFileSync(join(data, 'preferences.json'), 'utf8'))['slow-listening:hardening:v1'], undefined);
   await application.evaluate(({ dialog }) => { globalThis.quitSaveErrors = []; dialog.showErrorBox = (title, message) => globalThis.quitSaveErrors.push({ title, message }); });
-  await page.evaluate(() => window.slowTuneDesktop.quit());
+  await page.evaluate(() => window.biBiMusicDesktop.quit());
   await page.waitForTimeout(300);
   assert.equal((await application.evaluate(() => globalThis.quitSaveErrors)).length, 1);
   assert.equal(application.process().exitCode, null, 'a failed final save keeps the app open');
@@ -75,7 +92,7 @@ test('desktop disclosures, native diagnostic copy, failed save recovery and imme
   assert.equal(JSON.parse(readFileSync(join(data, 'preferences.json'), 'utf8'))['slow-listening:hardening:v1'], 'unsaved');
   // The small, debounced window-state file also reports failure without crashing.
   mkdirSync(join(data, 'desktop-state.json.tmp'));
-  await page.evaluate(() => window.slowTuneDesktop.setWindowAppearance({ theme: 'light', mode: 'standard' }));
+  await page.evaluate(() => window.biBiMusicDesktop.setWindowAppearance({ theme: 'light', mode: 'standard' }));
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor();
   assert.equal(application.process().exitCode, null);
   rmSync(join(data, 'desktop-state.json.tmp'), { recursive: true });
@@ -83,12 +100,12 @@ test('desktop disclosures, native diagnostic copy, failed save recovery and imme
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor({ state: 'hidden' });
   assert.equal(JSON.parse(readFileSync(join(data, 'desktop-state.json'), 'utf8')).windowTheme, 'light');
   // Queue invokes without waiting for their disk acknowledgements, then close now.
-  await page.evaluate(() => { for (let i = 0; i < 100; i++) void window.slowTuneDesktop.writePreference('slow-listening:hardening:v1', 'final-' + i); });
+  await page.evaluate(() => { for (let i = 0; i < 100; i++) void window.biBiMusicDesktop.writePreference('slow-listening:hardening:v1', 'final-' + i); });
   await closeDesktop(application, { mainWindow: true }); application = undefined;
   assert.equal(JSON.parse(readFileSync(join(data, 'preferences.json'), 'utf8'))['slow-listening:hardening:v1'], 'final-99');
   assert.equal(existsSync(join(data, 'runtime/service.json')), false);
   page = await launch();
-  assert.equal(await page.evaluate(() => window.slowTuneDesktop.readPreferences().then(values => values['slow-listening:hardening:v1'])), 'final-99');
+  assert.equal(await page.evaluate(() => window.biBiMusicDesktop.readPreferences().then(values => values['slow-listening:hardening:v1'])), 'final-99');
   await closeDesktop(application); application = undefined;
   assert.deepEqual(errors, []);
 });

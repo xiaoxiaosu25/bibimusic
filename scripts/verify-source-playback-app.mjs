@@ -48,7 +48,7 @@ try{
     return route.continue();
   });
   const api=async(path,body)=>{
-    const response=await context.request.fetch(service.base+path,{method:body===undefined?'GET':'POST',headers:{'X-Music-App':'1','X-SlowTune-Surface':'desktop'},...(body===undefined?{}:{data:body}),timeout:30000});
+    const response=await context.request.fetch(service.base+path,{method:body===undefined?'GET':'POST',headers:{'X-Music-App':'1','X-BiBiMusic-Surface':'desktop'},...(body===undefined?{}:{data:body}),timeout:30000});
     return {status:response.status(),data:await response.json()};
   };
   assert.equal((await api('/api/login',{accessKey:service.config.accessKey})).status,200);
@@ -58,7 +58,7 @@ try{
   const begin=(method,...args)=>page.evaluate(({method,args})=>{window.baselineTask=window.sourceBaseline[method](...args);},{method,args});
   const state=()=>page.evaluate(()=>{const a=document.querySelector('audio'),p=window.sourceBaseline;return {current:p.currentTrackId(),format:p.snapshot.format??null,position:a.currentTime,paused:a.paused,mediaCode:a.error?.code??null,preparing:p.preparing,errorPresent:!!p.error,elements:document.querySelectorAll('audio').length,records:p.records()};});
   let http=[];
-  page.on('response',response=>{const url=new URL(response.url());if(!/^\/(api|v1)\//.test(url.pathname))return;http.push({path:safePath(url.pathname),status:response.status(),serverOperation:response.headers()['x-slowtune-operation']??null,at:Date.now()});});
+  page.on('response',response=>{const url=new URL(response.url());if(!/^\/(api|v1)\//.test(url.pathname))return;http.push({path:safePath(url.pathname),status:response.status(),serverOperation:response.headers()['x-bibimusic-operation']??null,at:Date.now()});});
   const settled=async()=>{for(let i=0;i<100;i++){const value=await api('/api/status');if(!value.data.sources.pending&&!value.data.delivery.activeReads&&!value.data.desktopPlayback.active&&!value.data.desktopPlayback.pending&&!value.data.desktopPlayback.inflight)return value.data;await new Promise(done=>setTimeout(done,30));}throw Error('Product work did not settle after cancellation');};
   async function measure(scenario,action,{expectPlaying=false,pending=false,naturalNext=false,pendingAction}={}){
     await call('stop');await settled();

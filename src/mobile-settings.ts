@@ -6,7 +6,7 @@ export const mobileSettingsTitles = {
   recommendation: '推荐偏好',
   access: '启动与访问',
   diagnostics: '数据与诊断',
-  about: '关于慢听',
+  about: '关于哔哔音乐',
 } as const;
 
 export type MobileSettingsSection = keyof typeof mobileSettingsTitles;

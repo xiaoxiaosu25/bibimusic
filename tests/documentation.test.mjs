@@ -141,7 +141,7 @@ test('Release packages final docs and rejects broken navigation before creating 
   assert(!existsSync(join(target, 'CONTRIBUTING.md')));
   assert(!existsSync(join(target, 'maintainer')));
   assert(!existsSync(join(target, 'docs/开发')));
-  assert.match(get(target, 'docs/运维/运行维护.md'), /https:\/\/github\.com\/xiaoxiaosu25\/slowtune\/blob\/main\/docs\//);
+  assert.match(get(target, 'docs/运维/运行维护.md'), /https:\/\/github\.com\/xiaoxiaosu25\/bibimusic\/blob\/main\/docs\//);
   assert(!existsSync(join(target, 'config.local.json')));
   assert(!existsSync(join(target, 'node_modules')));
   assert(!existsSync(join(target, 'workspace.paths.json')), 'standalone runtime deliveries omit development-only paths');

@@ -15,13 +15,13 @@ const run = promisify(execFile), here = dirname(fileURLToPath(import.meta.url));
 const sourceRoot = resolve(here, '..');
 const serviceRoot = app.isPackaged ? join(process.resourcesPath, 'service') : resolve(process.env.MUSIC_APP_DESKTOP_ROOT ?? sourceRoot);
 const dataDirectory = desktopDataDirectory(process.env, app.isPackaged ? dirname(app.getPath('exe')) : sourceRoot);
-app.setName('SlowTune');
-if (process.platform === 'win32') app.setAppUserModelId('studio.slowtune.desktop');
+app.setName('BiBiMusic');
+if (process.platform === 'win32') app.setAppUserModelId('studio.bibimusic.desktop');
 app.setPath('userData', join(dataDirectory, 'profile'));
 app.setAppLogsPath(join(dataDirectory, 'logs'));
 app.commandLine.appendSwitch('disk-cache-dir', join(dataDirectory, 'cache'));
 if (!app.requestSingleInstanceLock()) app.quit();
-else void start().catch(error => { dialog.showErrorBox('慢听桌面启动失败', error.message); app.exit(1); });
+else void start().catch(error => { dialog.showErrorBox('哔哔音乐桌面启动失败', error.message); app.exit(1); });
 
 async function start() {
   let player, overlay, tray, quitting = false, quitComplete = false, starting = false, base = '', connection, storage, allowedPage = '';
@@ -172,12 +172,12 @@ async function start() {
   }
   function updateMenu() {
     const items = [
-      { label: '打开慢听', click: showPlayer },
+      { label: '打开哔哔音乐', click: showPlayer },
       { label: '桌面歌词', type: 'checkbox', checked: prefs.visible, enabled: !!stateStorage && !exitRecovery && !quitting, click: item => updatePreferences({ visible: item.checked }) },
       ...(prefs.locked ? [{ label: '解锁歌词（恢复鼠标操作）', enabled: prefs.visible && !exitRecovery && !quitting, click: () => updatePreferences({ locked: false }) }] : []),
       { label: '重置歌词位置', enabled: !!stateStorage && !exitRecovery && !quitting, click: resetLyricsPosition },
       { type: 'separator' },
-      { label: '退出慢听', click: () => app.quit() },
+      { label: '退出哔哔音乐', click: () => app.quit() },
     ];
     tray?.setContextMenu(Menu.buildFromTemplate(items));
     Menu.setApplicationMenu(null);
@@ -201,8 +201,8 @@ async function start() {
   }
   function createOverlay() {
     const height = lyricHeight();
-    overlay = new BrowserWindow({ ...boundsFor(saved.overlayBounds ? { ...saved.overlayBounds, height } : undefined, { width: 420, height: 150 }, { width: 920, height }), title: '慢听 · 桌面歌词', show: false, transparent: true, frame: false, resizable: false, maximizable: false, fullscreenable: false, skipTaskbar: true, alwaysOnTop: true, hasShadow: false,
-      webPreferences: { preload: join(here, 'lyrics-preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, backgroundThrottling: false, partition: 'slowtune-lyrics' } });
+    overlay = new BrowserWindow({ ...boundsFor(saved.overlayBounds ? { ...saved.overlayBounds, height } : undefined, { width: 420, height: 150 }, { width: 920, height }), title: '哔哔音乐 · 桌面歌词', show: false, transparent: true, frame: false, resizable: false, maximizable: false, fullscreenable: false, skipTaskbar: true, alwaysOnTop: true, hasShadow: false,
+      webPreferences: { preload: join(here, 'lyrics-preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, backgroundThrottling: false, partition: 'bibimusic-lyrics' } });
     overlay.setAlwaysOnTop(true, process.platform === 'win32' ? 'pop-up-menu' : 'floating');
     secureWindow(overlay, () => fileURL('lyrics.html'));
     overlay.on('move', () => { saved.overlayBounds = compactOverlayBounds(); saveSoon(); });
@@ -232,8 +232,8 @@ async function start() {
     allowedPage = '';
     const bounds = boundsFor(saved.windowBounds, { width: 1000, height: 640 }, { width: 1360, height: 860 });
     appearance = { ...appearance, mode: 'welcome' };
-    player = new BrowserWindow({ ...bounds, minWidth: 1000, minHeight: 640, title: '慢听 SlowTune', icon, backgroundColor: colors(appearance.theme).background, show: false, titleBarStyle: 'hidden', titleBarOverlay: chrome(appearance.theme, appearance.mode),
-      webPreferences: { preload: join(here, 'player-preload.cjs'), partition: 'persist:slowtune-player', nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, backgroundThrottling: false } });
+    player = new BrowserWindow({ ...bounds, minWidth: 1000, minHeight: 640, title: '哔哔音乐 BiBiMusic', icon, backgroundColor: colors(appearance.theme).background, show: false, titleBarStyle: 'hidden', titleBarOverlay: chrome(appearance.theme, appearance.mode),
+      webPreferences: { preload: join(here, 'player-preload.cjs'), partition: 'persist:bibimusic-player', nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true, backgroundThrottling: false } });
     secureWindow(player, () => allowedPage);
     player.removeMenu();
     player.on('enter-full-screen', applyWindowAppearance); player.on('leave-full-screen', applyWindowAppearance);
@@ -259,7 +259,7 @@ async function start() {
       allowedPage = base + '/';
       await player.loadURL(base + '/');
     }
-    catch { if (quitting) return; throw new Error('播放页面加载失败，请重试打开慢听。'); }
+    catch { if (quitting) return; throw new Error('播放页面加载失败，请重试打开哔哔音乐。'); }
     delete saved.configFile; saveSoon(); status = { phase: 'ready', message: '' };
     if (quitting) return;
     player.show(); if (prefs.visible && !overlay) createOverlay(); applyOverlay(); broadcast(); updateMenu();
@@ -267,7 +267,13 @@ async function start() {
   const setupState = () => {
     let welcome;
     try { welcome = JSON.parse(readFileSync(join(dataDirectory, 'welcome.json'), 'utf8')); } catch {}
-    if (!welcome?.image) { try { welcome = { ...welcome, image: 'data:image/png;base64,' + readFileSync(join(serviceRoot, 'dist/client/assets/coast.png')).toString('base64') }; } catch {} }
+    // Built-in artwork belongs to the current build, not to the persisted custom-image cache.
+    if (welcome?.settings?.background !== 'custom' || !welcome?.image) {
+      welcome = { ...welcome, settings: welcome?.settings ?? { background: 'builtin', desktopFocus: { x: 50, y: 50 }, shade: 8 }, image: undefined };
+      if (welcome.settings.background !== 'plain') {
+        try { welcome.image = 'data:image/png;base64,' + readFileSync(join(serviceRoot, 'dist/client/assets/welcome-listening-desk.png')).toString('base64'); } catch {}
+      }
+    }
     return { ...status, retryLabel: exitRecovery ? '重试保存并退出' : '重试', theme: appearance.theme, welcome };
   };
   function openSetup(phase = 'starting', message = '') {
@@ -285,7 +291,7 @@ async function start() {
     applyWindowAppearance();
     if (allowedPage !== fileURL('setup.html')) {
       allowedPage = fileURL('setup.html');
-      welcomeLoaded = player.loadFile(join(here, 'setup.html')).catch(error => { if (!quitting) dialog.showErrorBox('慢听启动失败', error.message); });
+      welcomeLoaded = player.loadFile(join(here, 'setup.html')).catch(error => { if (!quitting) dialog.showErrorBox('哔哔音乐启动失败', error.message); });
     } else send(player, 'desktop:setup-state', setupState());
     showPlayer();
     updateMenu();
@@ -414,7 +420,7 @@ async function start() {
     if (quitComplete) return;
     event.preventDefault();
     if (quitting) return;
-    quitting = true; welcomeWait.abort(); tray?.setToolTip('慢听 · 正在保存并退出…'); updateMenu();
+    quitting = true; welcomeWait.abort(); tray?.setToolTip('哔哔音乐 · 正在保存并退出…'); updateMenu();
     void (async () => {
       await connection;
       quitStage = '释放播放器前保存';
@@ -439,15 +445,15 @@ async function start() {
       quitComplete = true; clearUnlockTarget();
       overlay?.destroy(); player?.destroy(); tray?.destroy(); app.quit();
     })().catch(error => {
-      quitting = false; tray?.setToolTip('慢听 · 退出未完成');
+      quitting = false; tray?.setToolTip('哔哔音乐 · 退出未完成');
       const persistence = preferenceState().pending ? '本地设置尚未保存，最新修改仍保留在内存中。请检查磁盘空间和资料目录权限。' : '请检查日志及本应用内部服务的状态。';
       const normalPlayer = player && !player.isDestroyed() && player.webContents.getURL() === base + '/';
       const message = `退出在“${quitStage}”阶段失败。${playerReleased ? '播放器已释放；' : releaseRequested ? '播放器已停用，释放尚未确认；' : '播放器尚未释放；'}${attemptedConfig ? '内部服务停止尚未确认。' : '内部服务已停止或尚未启动。'}${persistence}`;
       if (releaseRequested || !normalPlayer || exitRecovery || quitStage === '停止内部服务' || quitStage === '内部服务停止后保存') {
         exitRecovery = true; document = clock = null; applyOverlay(); broadcast();
-        openSetup('error', message + '点击“重试保存并退出”继续退出；退出完成后可重新打开慢听。');
+        openSetup('error', message + '点击“重试保存并退出”继续退出；退出完成后可重新打开哔哔音乐。');
       } else { showPlayer(); updateMenu(); }
-      dialog.showErrorBox('慢听尚未退出', message + (exitRecovery ? '请使用恢复页的“重试保存并退出”。' : '请点击“重试保存偏好”后再次退出。'));
+      dialog.showErrorBox('哔哔音乐尚未退出', message + (exitRecovery ? '请使用恢复页的“重试保存并退出”。' : '请点击“重试保存偏好”后再次退出。'));
       try { appendFileSync(join(dataDirectory, 'logs/desktop-launch.log'), `${new Date().toISOString()} ${quitStage}: ${error.stderr?.trim() || error.message}\n`, { mode: 0o600 }); } catch {}
     });
   });
@@ -460,7 +466,7 @@ async function start() {
     });
     app.once('will-quit', closeLifecycle);
   }
-  tray = new Tray(icon); tray.setToolTip('慢听 SlowTune'); tray.on('double-click', showPlayer); tray.on('click', showPlayer);
+  tray = new Tray(icon); tray.setToolTip('哔哔音乐 BiBiMusic'); tray.on('double-click', showPlayer); tray.on('click', showPlayer);
   powerMonitor.on('suspend', () => { send(player, 'desktop:command', 'suspend'); });
   powerMonitor.on('resume', () => { send(player, 'desktop:command', 'resync'); if (prefs.visible) applyOverlay(); });
   screen.on('display-removed', () => { if (overlay) overlay.setBounds(boundsFor(overlay.getBounds(), { width: 420, height: 150 }, { width: 920, height: 190 })); });

@@ -113,15 +113,15 @@ test('complete data backup restores current stores, synthetic DPAPI credentials 
   const savedPrefs = { 'slow-listening:theme:v1': 'dark', 'slow-listening:playback:v3': JSON.stringify(queueRecord([track], { volume: .37, rate: 1.25, order: 'sequential', repeat: 'one' })) };
   const lyricPrefs = { visible: true, locked: true, fontSize: 38, color: '#ddeeff', highlight: '#a6e9c5', lines: 1, translations: false };
   await page.evaluate(async ({ savedPrefs, lyricPrefs, welcome, image }) => {
-    for (const [key, value] of Object.entries(savedPrefs)) await window.slowTuneDesktop.writePreference(key, value);
-    await window.slowTuneDesktop.updateLyricsPreferences(lyricPrefs);
-    await window.slowTuneDesktop.saveWelcome({ settings: welcome.welcome, image });
-    window.slowTuneDesktop.setWindowAppearance({ theme: 'dark', mode: 'standard' });
+    for (const [key, value] of Object.entries(savedPrefs)) await window.biBiMusicDesktop.writePreference(key, value);
+    await window.biBiMusicDesktop.updateLyricsPreferences(lyricPrefs);
+    await window.biBiMusicDesktop.saveWelcome({ settings: welcome.welcome, image });
+    window.biBiMusicDesktop.setWindowAppearance({ theme: 'dark', mode: 'standard' });
   }, { savedPrefs, lyricPrefs, welcome, image });
   // Let the actual player read and bind the queue before taking its backup.
   await page.reload();
   await page.getByRole('button', { name: '打开正在播放', exact: true }).waitFor();
-  await application.evaluate(({ BrowserWindow }) => { const w = BrowserWindow.getAllWindows().find(w => w.webContents.getURL().startsWith('http:')); w.setBounds({ x: 110, y: 100, width: 1100, height: 700 }); BrowserWindow.getAllWindows().find(w => w.getTitle() === '慢听 · 桌面歌词').setPosition(150, 180); });
+  await application.evaluate(({ BrowserWindow }) => { const w = BrowserWindow.getAllWindows().find(w => w.webContents.getURL().startsWith('http:')); w.setBounds({ x: 110, y: 100, width: 1100, height: 700 }); BrowserWindow.getAllWindows().find(w => w.getTitle() === '哔哔音乐 · 桌面歌词').setPosition(150, 180); });
   await closeDesktop(application, { mainWindow: true }); application = undefined;
   assert.equal(existsSync(join(original, 'runtime/service.json')), false);
   assert.equal(existsSync(join(original, 'desktop-runtime.json')), false);
@@ -150,9 +150,9 @@ test('complete data backup restores current stores, synthetic DPAPI credentials 
     const selected = validateLocalProfile(restored);
     assert.notEqual(selected.port, config.port); if (opening) assert.equal(selected.port, selectedPort); selectedPort = selected.port;
     assert.equal(selected.userSpace, config.userSpace); assert.equal(selected.database, config.database);
-    assert.equal(await page.evaluate(() => window.slowTuneDesktop.getDataDirectory()), restored);
-    assert.deepEqual(await page.evaluate(() => window.slowTuneDesktop.readPreferences()), persistedPrefs);
-    assert.deepEqual(await page.evaluate(() => window.slowTuneDesktop.getState().then(state => state.preferences)), lyricPrefs);
+    assert.equal(await page.evaluate(() => window.biBiMusicDesktop.getDataDirectory()), restored);
+    assert.deepEqual(await page.evaluate(() => window.biBiMusicDesktop.readPreferences()), persistedPrefs);
+    assert.deepEqual(await page.evaluate(() => window.biBiMusicDesktop.getState().then(state => state.preferences)), lyricPrefs);
     assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
     assert.equal(await page.locator('audio').evaluate(audio => audio.paused), true, 'restored queue remains silent');
     assert.deepEqual(await json(page, '/api/song-library'), { modelVersion: 1, revision: savedLibrary.revision, snapshot: savedLibrary.document.snapshot });
@@ -165,7 +165,7 @@ test('complete data backup restores current stores, synthetic DPAPI credentials 
     const imageBytes = await page.evaluate(id => fetch('/api/welcome/image/' + id).then(r => r.arrayBuffer()).then(b => Array.from(new Uint8Array(b))), welcome.welcome.imageId);
     assert.deepEqual(Buffer.from(imageBytes), readFileSync(join(root, 'public/assets/coast.png')));
     const native = await lyricWindowState(application); assert.equal(native.electron.visible, false); assert.equal(native.native.topmost, true, 'restored locked hidden window retains native topmost');
-    const bounds = await application.evaluate(({ BrowserWindow }) => ({ player: BrowserWindow.getAllWindows().find(w => w.webContents.getURL().startsWith('http:')).getBounds(), overlay: BrowserWindow.getAllWindows().find(w => w.getTitle() === '慢听 · 桌面歌词').getBounds() }));
+    const bounds = await application.evaluate(({ BrowserWindow }) => ({ player: BrowserWindow.getAllWindows().find(w => w.webContents.getURL().startsWith('http:')).getBounds(), overlay: BrowserWindow.getAllWindows().find(w => w.getTitle() === '哔哔音乐 · 桌面歌词').getBounds() }));
     assert.deepEqual(bounds.player, desktopState.windowBounds); assert.deepEqual(bounds.overlay, desktopState.overlayBounds);
     const active = JSON.parse(readFileSync(join(restored, 'runtime/service.json'), 'utf8'));
     assert.notEqual(active.pid, dead); assert.equal(active.port, selectedPort);

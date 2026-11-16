@@ -17,7 +17,7 @@ export function desktopDiagnostics({ runtime, status, account, checkedAt, refres
   const accountState = account?.state;
   const savedError = runtime?.preferences?.error;
   return [
-    '慢听 Windows 桌面诊断',
+    '哔哔音乐 Windows 桌面诊断',
     `应用版本：${version(runtime?.appVersion)}`,
     `内部服务版本：${version(status?.version)}`,
     `系统：${runtime?.platform === 'win32' ? 'Windows' : '未知'} · ${['x64', 'arm64', 'ia32'].includes(runtime?.arch ?? '') ? runtime!.arch : '未知'}`,

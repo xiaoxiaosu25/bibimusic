@@ -32,11 +32,11 @@ type DesktopAPI = {
   onState(callback: (value: HostState) => void): () => void;
   onCommand(callback: (value: string) => void): () => void;
 };
-declare global { interface Window { slowTuneDesktop?: DesktopAPI } }
+declare global { interface Window { biBiMusicDesktop?: DesktopAPI; } }
 
-const empty: HostDocument = { sourceKey: '', title: '', status: '慢听 · 等待音乐', offsetMs: 0, synced: false, instrumental: false, lines: [] };
+const empty: HostDocument = { sourceKey: '', title: '', status: '哔哔音乐 · 等待音乐', offsetMs: 0, synced: false, instrumental: false, lines: [] };
 export function useDesktopHost(lyrics: LyricsController, playback: LyricPlayback, active: boolean, commands: { toggle(): unknown; previous(): unknown; next(): unknown; release(): unknown }, onError: (error: unknown) => void) {
-  const api = window.slowTuneDesktop;
+  const api = window.biBiMusicDesktop;
   const [visible, setVisible] = useState(false);
   const live = useRef({ lyrics, playback, active, commands, onError }); live.current = { lyrics, playback, active, commands, onError };
   const sourceKey = active ? lyrics.sourceKey : '';

@@ -18,14 +18,21 @@ test('real desktop enters its local profile without a code and restores a revoke
   t.after(async () => { if (application) await closeDesktop(application); });
   const splash = await application.firstWindow();
   await splash.waitForURL('**/setup.html');
-  await splash.getByRole('heading', { name: '慢听', exact: true }).waitFor();
-  await splash.waitForFunction(() => performance.getEntriesByName('slowtune:welcome-visible').length > 0);
-  const splashStarted = await splash.evaluate(() => performance.timeOrigin + performance.getEntriesByName('slowtune:welcome-visible').at(-1).startTime);
+  await splash.getByRole('heading', { name: '哔哔音乐', exact: true }).waitFor();
+  assert.equal(await application.evaluate(({ app }) => app.getName()), 'BiBiMusic');
+  assert.equal(await splash.evaluate(() => typeof window.biBiMusicSetup?.getState), 'function');
+  await splash.waitForFunction(() => performance.getEntriesByName('bibimusic:welcome-visible').length > 0);
+  assert.equal(await splash.locator('#background').evaluate(image => !image.hidden && image.naturalWidth > 1000), true, 'first launch displays the built-in music desk artwork');
+  assert.equal(await splash.locator('#shade').evaluate(element => element.style.opacity), '0.08');
+  const splashStarted = await splash.evaluate(() => performance.timeOrigin + performance.getEntriesByName('bibimusic:welcome-visible').at(-1).startTime);
   await splash.screenshot({ path: join(data, 'startup.png'), animations: 'disabled' });
   let page;
   for (let n = 0; n < 350; n++) { page = application.windows().find(window => window.url().startsWith('http:')); if (page) break; await new Promise(done => setTimeout(done, 100)); }
   assert(page, 'the player opens automatically');
   await page.getByRole('button', { name: '打开正在播放', exact: true }).waitFor({ timeout: 20000 });
+  assert.match(await page.title(), /哔哔音乐 BiBiMusic/);
+  assert.equal(await page.evaluate(() => typeof window.biBiMusicDesktop?.getState), 'function');
+  assert.equal(await page.evaluate(() => 'slowTuneDesktop' in window), false);
   assert(await page.evaluate(() => performance.timeOrigin) - splashStarted >= 2000, 'the complete splash stays visible for at least two seconds after its artwork and entrance animation finish');
   assert.equal(await page.getByLabel('服务访问码', { exact: true }).count(), 0);
   assert.equal(application.windows().some(window => window.url().endsWith('/setup.html')), false);
@@ -55,10 +62,14 @@ test('real desktop enters its local profile without a code and restores a revoke
 test('startup errors keep the same welcome window and retry without a configuration picker', { timeout: 60000 }, async t => {
   const root = resolve('.'), output = join(developmentPaths().testRuntime, 'desktop-local-startup-tests'); mkdirSync(output, { recursive: true });
   const data = mkdtempSync(join(output, 'retry-')), file = await ensureLocalProfile(data), config = JSON.parse(readFileSync(file, 'utf8'));
+  writeFileSync(join(data, 'welcome.json'), JSON.stringify({ settings: { background: 'builtin', desktopFocus: { x: 42, y: 48 }, shade: 15 }, image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=' }));
   writeFileSync(file, JSON.stringify({ ...config, host: '0.0.0.0' }));
   const env = { ...process.env, MUSIC_APP_DESKTOP_DATA: data, MUSIC_APP_DESKTOP_ROOT: resolve(process.env.MUSIC_APP_TEST_BUILD ?? desktopBuildDirectory()), MUSIC_APP_NODE: process.execPath }; delete env.ELECTRON_RUN_AS_NODE; delete env.NODE_OPTIONS;
   const application = await _electron.launch({ executablePath: electron, args: [join(root, 'desktop')], env, timeout: 25000 }); t.after(() => closeDesktop(application));
   const page = await application.firstWindow(); await page.getByText('桌面内部连接必须仅限本机。', { exact: true }).waitFor();
+  await page.waitForFunction(() => document.querySelector('#background')?.naturalWidth > 1000);
+  assert.equal(await page.locator('#background').evaluate(image => getComputedStyle(image).objectPosition), '42% 48%', 'updated built-in artwork retains saved framing');
+  assert.equal(await page.locator('#shade').evaluate(element => element.style.opacity), '0.15', 'saved shading is retained');
   const id = await application.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].id);
   assert.equal(application.windows().length, 1); assert.equal(await page.getByRole('button', { name: '选择服务配置…', exact: true }).count(), 0);
   await page.getByRole('button', { name: '打开日志文件夹', exact: true }).waitFor(); await page.getByRole('button', { name: '退出', exact: true }).waitFor();

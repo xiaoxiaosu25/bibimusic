@@ -91,7 +91,7 @@ export function Sidebar() {
     <>
       {page !== 'playing' && (
         <aside className="sidebar">
-          <Button variant="plain" className="brand" aria-label="慢听" onClick={() => navigate('discover')}>
+          <Button variant="plain" className="brand" aria-label="哔哔音乐" onClick={() => navigate('discover')}>
             <span className="brand-mark">
               <HeadphonesIcon size={22} weight="bold" />
             </span>

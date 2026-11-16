@@ -24,7 +24,7 @@ test('product manual recovery uses the failed source, position and newest transp
   const json = (res, value, status = 200) => { res.writeHead(status, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(value)); };
   const server = createServer(async (req, res) => {
     const url = new URL(req.url, 'http://127.0.0.1');
-    if(url.pathname.startsWith('/v1/call/'))res.setHeader('X-SlowTune-Operation','desktop-'+ ++requestSerial);
+    if(url.pathname.startsWith('/v1/call/'))res.setHeader('X-BiBiMusic-Operation','desktop-'+ ++requestSerial);
     requests.push({ path: url.pathname, method: req.method, injected: url.pathname === '/audio.wav' && fault === url.searchParams.get('lease') || url.pathname === '/v1/call/prepare' && failPrepare });
     if (url.pathname === '/probe.js') { res.setHeader('Content-Type', 'text/javascript'); return res.end(bundle); }
     if (url.pathname === '/v1/handshake') return json(res, { protocol: 2, capabilities: [{ provider: 'bilibili', operations: ['metadata', 'prepare'], anonymous: true, limitations: [] }] });
@@ -56,7 +56,7 @@ test('product manual recovery uses the failed source, position and newest transp
   const browser = await chromium.launch({ headless: true, args: ['--autoplay-policy=no-user-gesture-required'] });
   t.after(async () => { gate?.release(); await browser.close(); server.closeAllConnections(); await new Promise(r => server.close(r)); const out = resolve('local/playback-retry'); mkdirSync(out, { recursive: true }); writeFileSync(out + '/regression.json', JSON.stringify({ records, leases, released: [...released], requests, errors, external }, null, 2)); });
   const page = await browser.newPage(); page.setDefaultTimeout(10000); page.on('pageerror', e => errors.push(e.message));
-  await page.addInitScript(()=>{window.resumeCallbacks=[];window.slowTuneDesktop={readPreferences:async()=>Object.fromEntries(Object.keys(localStorage).filter(key=>key.startsWith('slow-listening:')).map(key=>[key,localStorage.getItem(key)])),writePreference:async(key,value)=>{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);},onCommand:callback=>{window.resumeCallbacks.push(callback);return ()=>{};}};});
+  await page.addInitScript(()=>{window.resumeCallbacks=[];window.biBiMusicDesktop={readPreferences:async()=>Object.fromEntries(Object.keys(localStorage).filter(key=>key.startsWith('slow-listening:')).map(key=>[key,localStorage.getItem(key)])),writePreference:async(key,value)=>{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);},onCommand:callback=>{window.resumeCallbacks.push(callback);return ()=>{};}};});
   await page.route('**/*', route => { if (route.request().url().startsWith(origin + '/')) return route.continue(); external.push(route.request().url()); return route.abort(); });
   await page.goto(origin); await page.waitForFunction(() => !!window.playbackProbe);
   const invoke = (method, ...args) => page.evaluate(({ method, args }) => window.playbackProbe[method](...args), { method, args });

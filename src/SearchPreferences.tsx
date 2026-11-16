@@ -59,7 +59,7 @@ export function SearchPreferencesSettings({onChanged}:{onChanged?:(state:SearchS
         <Button variant="secondary"  disabled={settings.busy||!dirty&&!restored} onClick={()=>{stage(settings.state!.config);setRestored(false);settings.setMessage('');}}>取消修改</Button>
         <Button variant="primary"  disabled={settings.busy||!dirty&&!restored} onClick={()=>void settings.write({action:'config',config:currentDraft}).then(state=>{if(state){stage(state.config);setRestored(false);settings.setMessage('搜索偏好已保存。');}})}>保存搜索偏好</Button>
       </div>
-      <p className="muted">{dirty?'有未保存的修改。':window.slowTuneDesktop?'保存在本桌面应用的 data 中，与服务版各自保存。':'同一服务的电脑和手机共用。'}{settings.state.defaultsVersion!==settings.state.defaults.version?' 有新版默认配置，可通过恢复默认载入。':''}</p>
+      <p className="muted">{dirty?'有未保存的修改。':window.biBiMusicDesktop?'保存在本桌面应用的 data 中，与服务版各自保存。':'同一服务的电脑和手机共用。'}{settings.state.defaultsVersion!==settings.state.defaults.version?' 有新版默认配置，可通过恢复默认载入。':''}</p>
       <details className="search-policy-details"><summary>自动匹配的优先结果（{settings.state.preferred.length}）</summary>
         {!settings.state.preferred.length&&<p className="muted">在搜索结果的更多操作里选择“自动匹配时优先选此结果”。</p>}
         <ul className="preferred-song-list">{settings.state.preferred.map(item=><li key={item.key}><div><strong>{item.song.title}{item.song.artists?.length?' · '+item.song.artists.join(' / '):''}</strong><span>{item.entry.title} · {item.entry.uploader?.name??(item.entry.ref.provider==='bilibili'?'B站':'YouTube')}</span></div><IconButton  aria-label={'取消指定版本 '+item.song.title} disabled={settings.busy} onClick={()=>void settings.write({action:'remove',key:item.key}).then(state=>{if(state)settings.setMessage('已取消指定版本。');})}><TrashIcon size={18}/></IconButton></li>)}</ul>

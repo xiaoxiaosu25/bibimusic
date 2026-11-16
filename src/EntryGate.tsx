@@ -12,7 +12,7 @@ import { DesktopStartup } from './DesktopStartup';
 
 let welcomeCacheGeneration = 0;
 export async function cacheDesktopWelcome(settings: BootstrapState['welcome']) {
-  const desktop = window.slowTuneDesktop; if (!desktop) return;
+  const desktop = window.biBiMusicDesktop; if (!desktop) return;
   const generation = ++welcomeCacheGeneration;
   let image: string | undefined;
   if (settings.background === 'custom' && settings.imageId) {
@@ -42,9 +42,9 @@ export function EntryGate({children}:{children:(client:MusicClient,preload:Start
         try{await request('/api/login',{accessKey},controller.signal);}catch(issue){if((issue as {code?:string}).code==='authentication')throw new Error('invalid-login');throw issue;}
         setCode('');
       }else if(!state.authenticated){
-        const restored=await window.slowTuneDesktop?.restoreLocalSession?.();
+        const restored=await window.biBiMusicDesktop?.restoreLocalSession?.();
         if(!restored){
-          if(window.slowTuneDesktop) throw new Error('本地访问尚未准备完成，请重试打开慢听。');
+          if(window.biBiMusicDesktop) throw new Error('本地访问尚未准备完成，请重试打开哔哔音乐。');
           if(state.authenticationRequired){setMode('login');return;}
           await request('/api/session',{},controller.signal);
         }
@@ -53,7 +53,7 @@ export function EntryGate({children}:{children:(client:MusicClient,preload:Start
       const connectClient=()=>connectSourceClient(location.origin,controller.signal);
       const connecting=connectClient().then(client=>{if(controller.signal.aborted){client.dispose();throw controller.signal.reason;}current.client=refreshableClient(client,connectClient);});
       await Promise.all([current.preload.ready(),connecting]);
-      const remaining=window.slowTuneDesktop?0:Math.max(0,1500-(Date.now()-started));
+      const remaining=window.biBiMusicDesktop?0:Math.max(0,1500-(Date.now()-started));
       if(remaining)await new Promise<void>(resolve=>{const wait=setTimeout(resolve,remaining);controller.signal.addEventListener('abort',()=>{clearTimeout(wait);resolve();},{once:true});});
       if(generation!==serial.current||controller.signal.aborted)return;
       setBundle({client:current.client!,preload:current.preload});setMode('workspace');
@@ -62,23 +62,23 @@ export function EntryGate({children}:{children:(client:MusicClient,preload:Start
       controller.abort();
       current.preload?.dispose();current.client?.dispose();current.client=undefined;
       const invalid=(issue as Error).message==='invalid-login';
-      setError(invalid?'访问码不正确，请重新输入。':(issue as Error).name==='TimeoutError'?(window.slowTuneDesktop?'本地音乐准备超时，请重试。':'连接服务超时，请检查服务后重试。'):errorText(issue));setMode(invalid?'login':'error');
+      setError(invalid?'访问码不正确，请重新输入。':(issue as Error).name==='TimeoutError'?(window.biBiMusicDesktop?'本地音乐准备超时，请重试。':'连接服务超时，请检查服务后重试。'):errorText(issue));setMode(invalid?'login':'error');
     }finally{clearTimeout(timer);}
   },[]);
-  useEffect(()=>{void start();const expired=()=>void start();window.addEventListener('slowtune:session-expired',expired);return()=>{++serial.current;active.current?.controller.abort();active.current?.preload?.dispose();active.current?.client?.dispose();window.removeEventListener('slowtune:session-expired',expired);};},[start]);
+  useEffect(()=>{void start();const expired=()=>void start();window.addEventListener('bibimusic:session-expired',expired);return()=>{++serial.current;active.current?.controller.abort();active.current?.preload?.dispose();active.current?.client?.dispose();window.removeEventListener('bibimusic:session-expired',expired);};},[start]);
   useEffect(() => {
-    if (mode === 'workspace' && window.slowTuneDesktop && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (mode === 'workspace' && window.biBiMusicDesktop && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.getElementById('root')?.animate([{ opacity: .25 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
     }
   }, [mode]);
   if(mode==='workspace'&&bundle)return children(bundle.client,bundle.preload,()=>void start());
-  if(window.slowTuneDesktop)return <DesktopStartup settings={bootstrap?.welcome??defaultWelcome()} message={mode==='error'?error:slow?'正在准备歌单与收藏…':'正在准备你的音乐…'} error={mode==='error'} onRetry={()=>void start()}/>;
+  if(window.biBiMusicDesktop)return <DesktopStartup settings={bootstrap?.welcome??defaultWelcome()} message={mode==='error'?error:slow?'正在准备歌单与收藏…':'正在准备你的音乐…'} error={mode==='error'} onRetry={()=>void start()}/>;
   return <WelcomeScreen settings={bootstrap?.welcome??defaultWelcome()}>
     {mode==='login'?<form className="welcome-login" onSubmit={event=>{event.preventDefault();void start(code);}}>
-      <label className="field"><span className="field-label">服务访问码</span><span className="welcome-password"><input className="input" aria-label="服务访问码" type={visible?'text':'password'} value={code} onChange={event=>setCode(event.target.value)} autoComplete="current-password" maxLength={256} required placeholder="输入访问码，进入你的音乐空间"/><IconButton type="button"  aria-label={visible?'隐藏访问码':'显示访问码'} onClick={()=>setVisible(value=>!value)}>{visible?<EyeSlashIcon size={19}/>:<EyeIcon size={19}/>}</IconButton></span></label>
+      <label className="field"><span className="field-label">服务访问码</span><span className="welcome-password"><input className="input" aria-label="服务访问码" type={visible?'text':'password'} value={code} onChange={event=>setCode(event.target.value)} autoComplete="current-password" maxLength={256} required placeholder="输入访问码，进入哔哔音乐"/><IconButton type="button"  aria-label={visible?'隐藏访问码':'显示访问码'} onClick={()=>setVisible(value=>!value)}>{visible?<EyeSlashIcon size={19}/>:<EyeIcon size={19}/>}</IconButton></span></label>
       {error&&<p className="feedback" data-tone="error" role="alert">{error}</p>}
-      <Button variant="primary" className="welcome-enter" type="submit">进入音乐空间<ArrowRightIcon size={19}/></Button>
+      <Button variant="primary" className="welcome-enter" type="submit">进入哔哔音乐<ArrowRightIcon size={19}/></Button>
       <details className="welcome-help"><summary>访问码是什么？</summary><p>这是此音乐服务的私人访问码。首次使用由服务配置提供，进入后可在「设置 → 启动与访问」中修改。B站账号在设置中单独登录。</p></details>
-    </form>:mode==='error'?<div className="welcome-status"><p className="feedback" data-tone="error" role="alert">{error}</p><Button variant="primary"  onClick={()=>void start()}><ArrowClockwiseIcon size={19}/>{window.slowTuneDesktop?'重试':'重新连接'}</Button>{window.slowTuneDesktop&&<><Button variant="secondary"  onClick={()=>void window.slowTuneDesktop?.openDirectory('logs')}>打开日志文件夹</Button><Button variant="ghost"  onClick={()=>window.slowTuneDesktop?.quit()}>退出</Button></>}</div>:<div className="welcome-status" role="status" aria-live="polite"><div className="welcome-loading"><SpinnerGapIcon size={22} className="welcome-spinner"/><span>{mode==='checking'&&!window.slowTuneDesktop?'正在连接音乐空间…':slow?'正在准备歌单与收藏…':'正在准备你的音乐…'}</span></div><p className="muted">{mode==='checking'&&slow&&!window.slowTuneDesktop?'服务响应较慢，请稍候。':'准备好后将自动进入'}</p></div>}
+    </form>:mode==='error'?<div className="welcome-status"><p className="feedback" data-tone="error" role="alert">{error}</p><Button variant="primary"  onClick={()=>void start()}><ArrowClockwiseIcon size={19}/>{window.biBiMusicDesktop?'重试':'重新连接'}</Button>{window.biBiMusicDesktop&&<><Button variant="secondary"  onClick={()=>void window.biBiMusicDesktop?.openDirectory('logs')}>打开日志文件夹</Button><Button variant="ghost"  onClick={()=>window.biBiMusicDesktop?.quit()}>退出</Button></>}</div>:<div className="welcome-status" role="status" aria-live="polite"><div className="welcome-loading"><SpinnerGapIcon size={22} className="welcome-spinner"/><span>{mode==='checking'&&!window.biBiMusicDesktop?'正在连接哔哔音乐…':slow?'正在准备歌单与收藏…':'正在准备你的音乐…'}</span></div><p className="muted">{mode==='checking'&&slow&&!window.biBiMusicDesktop?'服务响应较慢，请稍候。':'准备好后将自动进入'}</p></div>}
   </WelcomeScreen>;
 }

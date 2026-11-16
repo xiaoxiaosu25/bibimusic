@@ -29,7 +29,7 @@ test('large desktop song management stays responsive during media clock updates'
   });
   await page.addInitScript(() => {
     window.managementLongTasks = [];
-    window.slowTuneRenderCounts={};
+    window.biBiMusicRenderCounts={};
     new PerformanceObserver(list => window.managementLongTasks.push(...list.getEntries().map(entry => Math.round(entry.duration)))).observe({ type: 'longtask' });
   });
   await page.goto(fixture.origin);
@@ -70,10 +70,10 @@ test('large desktop song management stays responsive during media clock updates'
   await page.waitForFunction(() => document.querySelector('audio[data-product-media]')?.currentTime > .2);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await libraryAction(page, '歌曲管理'); await manager.waitFor();
-  await page.waitForTimeout(300); await page.evaluate(() => { window.managementLongTasks = [];window.slowTuneRenderCounts={}; });
+  await page.waitForTimeout(300); await page.evaluate(() => { window.managementLongTasks = [];window.biBiMusicRenderCounts={}; });
   await page.waitForTimeout(1800);
   const clockTasks = await page.evaluate(() => window.managementLongTasks);
-  const clockComponentRenders=await page.evaluate(()=>window.slowTuneRenderCounts);
+  const clockComponentRenders=await page.evaluate(()=>window.biBiMusicRenderCounts);
   const median = values => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
   const report = { songs: library.snapshot.songs.length, versions: library.snapshot.versions.length, playlistEntries: 50002, cpuSlowdown: 4, opens, searches, openMedianMs: median(opens), searchMedianMs: median(searches), clockTasks,clockComponentRenders, baseline: { openMs: 582.6, searchMs: 110.6, clockTaskMs: [182, 170, 199, 163, 172, 204] } };
   const artifacts = resolve(process.env.MUSIC_APP_PERF_ARTIFACTS??'local/verification/song-management-performance'); await mkdir(artifacts, { recursive: true });

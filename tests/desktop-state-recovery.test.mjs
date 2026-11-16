@@ -51,27 +51,27 @@ test('preserving a damaged file under another name enables explicit retry and no
   const page = await f.launch(); await page.getByRole('button', { name: '重试', exact: true }).waitFor();
   renameSync(file, file + '.retained');
   await page.getByRole('button', { name: '重试', exact: true }).click(); await ready(page);
-  await page.evaluate(() => window.slowTuneDesktop.updateLyricsPreferences({ fontSize: 42, locked: true }));
+  await page.evaluate(() => window.biBiMusicDesktop.updateLyricsPreferences({ fontSize: 42, locked: true }));
   await f.close(); assert.equal(readFileSync(file + '.retained', 'utf8'), '{keep this original');
   const reopened = await f.launch(); await ready(reopened);
-  assert.equal(await reopened.evaluate(() => window.slowTuneDesktop.getState().then(state => state.preferences.fontSize)), 42);
+  assert.equal(await reopened.evaluate(() => window.biBiMusicDesktop.getState().then(state => state.preferences.fontSize)), 42);
   await f.close();
 });
 
 test('welcome save rejection is visible, preserves last file, and retry plus immediate exit saves the newest artwork', { timeout: 65000 }, async t => {
   const f = await fixture(t), page = await f.launch(); await ready(page);
-  const file = join(f.data, 'welcome.json'); await page.evaluate(() => window.slowTuneDesktop.flushPreferences());
+  const file = join(f.data, 'welcome.json'); await page.evaluate(() => window.biBiMusicDesktop.flushPreferences());
   const old = readFileSync(file, 'utf8'); mkdirSync(file + '.tmp');
   f.cleanup.push(() => rmSync(file + '.tmp', { recursive: true, force: true }));
   const settings = { background: 'plain', position: 'right', desktopFocus: { x: 21, y: 62 }, shade: 42 };
-  assert.match(await page.evaluate(settings => window.slowTuneDesktop.saveWelcome({ settings }).then(() => 'unexpected success', error => error.message), settings), /尚未保存/);
+  assert.match(await page.evaluate(settings => window.biBiMusicDesktop.saveWelcome({ settings }).then(() => 'unexpected success', error => error.message), settings), /尚未保存/);
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor();
   assert.equal(readFileSync(file, 'utf8'), old);
   rmSync(file + '.tmp', { recursive: true });
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).click();
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor({ state: 'hidden' });
   assert.deepEqual(JSON.parse(readFileSync(file)).settings, settings);
-  await page.evaluate(settings => { void window.slowTuneDesktop.saveWelcome({ settings: { ...settings, position: 'left' } }); }, settings);
+  await page.evaluate(settings => { void window.biBiMusicDesktop.saveWelcome({ settings: { ...settings, position: 'left' } }); }, settings);
   await f.close(); assert.equal(JSON.parse(readFileSync(file)).settings.position, 'left');
 });
 
@@ -81,7 +81,7 @@ test('stop ownership failure leaves a released player on an explicit retry-exit 
   const service = JSON.parse(readFileSync(join(f.data, 'runtime/service.json')));
   writeFileSync(marker, JSON.stringify({ ...JSON.parse(original), identity: 'controlled-ownership-mismatch' }));
   f.cleanup.push(() => { if (existsSync(marker)) writeFileSync(marker, original); });
-  await page.evaluate(() => { window.slowTuneDesktop.quit(); window.slowTuneDesktop.quit(); });
+  await page.evaluate(() => { window.biBiMusicDesktop.quit(); window.biBiMusicDesktop.quit(); });
   await page.getByRole('button', { name: '重试保存并退出', exact: true }).waitFor();
   assert.match(await page.locator('#status').innerText(), /停止内部服务.*播放器已释放.*停止尚未确认/s);
   assert(alive(service.pid)); assert.equal(f.app().windows().filter(page => page.url().startsWith('http:')).length, 0);
@@ -93,7 +93,7 @@ test('stop ownership failure leaves a released player on an explicit retry-exit 
 
 test('state modified as the service stops survives a final write failure and retries after service shutdown', { timeout: 65000 }, async t => {
   const f = await fixture(t), page = await f.launch(); await ready(page);
-  await page.evaluate(() => window.slowTuneDesktop.flushPreferences());
+  await page.evaluate(() => window.biBiMusicDesktop.flushPreferences());
   const file = join(f.data, 'desktop-state.json'), old = readFileSync(file, 'utf8');
   f.cleanup.push(() => rmSync(file + '.tmp', { recursive: true, force: true }));
   const service = JSON.parse(readFileSync(join(f.data, 'runtime/service.json')));
@@ -105,12 +105,12 @@ test('state modified as the service stops survives a final write failure and ret
       if (name !== 'service.json' || fs.existsSync(path.join(data, 'runtime/service.json'))) return;
       globalThis.quitWatcher.close();
       fs.mkdirSync(path.join(data, 'desktop-state.json.tmp'));
-      const w = BrowserWindow.getAllWindows().find(w => w.getTitle() !== '慢听 · 桌面歌词');
+      const w = BrowserWindow.getAllWindows().find(w => w.getTitle() !== '哔哔音乐 · 桌面歌词');
       globalThis.stopWaitPage = w.webContents.getURL();
       w.setSize(1120, 720); w.emit('resize');
     });
   }, f.data);
-  await page.evaluate(() => window.slowTuneDesktop.quit());
+  await page.evaluate(() => window.biBiMusicDesktop.quit());
   await page.getByRole('button', { name: '重试保存并退出', exact: true }).waitFor();
   assert.match(await page.locator('#status').innerText(), /内部服务停止后保存.*播放器已释放.*内部服务已停止/s);
   assert.equal(alive(service.pid), false); assert.equal(readFileSync(file, 'utf8'), old);
@@ -133,13 +133,13 @@ test('release rejection and missing acknowledgement show a disabled player and a
       w.webContents.send = (channel, ...args) => {
         if (channel === 'desktop:command' && args[0] === 'release') {
           globalThis.releaseCalls++;
-          if (outcome === 'rejected') void w.webContents.executeJavaScript('window.slowTuneDesktop.playbackReleased(false)');
+          if (outcome === 'rejected') void w.webContents.executeJavaScript('window.biBiMusicDesktop.playbackReleased(false)');
           return;
         }
         return send(channel, ...args);
       };
     }, outcome);
-    await page.evaluate(() => window.slowTuneDesktop.quit());
+    await page.evaluate(() => window.biBiMusicDesktop.quit());
     await page.getByRole('button', { name: '重试保存并退出', exact: true }).waitFor();
     assert.match(await page.locator('#status').innerText(), /释放播放器.*已停用，释放尚未确认/s);
     assert.match(readFileSync(join(f.data, 'logs/desktop-launch.log'), 'utf8'), outcome === 'rejected' ? /播放器释放失败/ : /未在规定时间内确认/);

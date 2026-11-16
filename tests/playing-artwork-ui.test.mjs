@@ -82,7 +82,7 @@ test('artwork cycles, real spectrum, uninterrupted audio and responsive layout',
   assert(Math.abs(record.width - record.height) < 1); assert(record.width <= 420);
   assert(Math.abs(label.width / record.width - .47619) < .01);
   assert.equal(await page.locator('.playing-art-vinyl img').count(), 1, 'the only image in the record is the blank material, never a song cover');
-  assert.equal(await page.locator('.playing-art-vinyl .vinyl-label-brand').textContent(), 'SLOWTUNE');
+  assert.equal(await page.locator('.playing-art-vinyl .vinyl-label-brand').textContent(), 'BIBIMUSIC');
   assert.equal(await page.locator('.playing-art-frequency img,.playing-art-halo img').count(), 0, 'both audio visualizers are abstract');
   assert.equal(await page.locator('.vinyl-record').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(25, 25, 27)');
   const stationarySheen = await page.locator('.vinyl-sheen').evaluate(el => getComputedStyle(el).transform);

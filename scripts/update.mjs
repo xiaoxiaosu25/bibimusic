@@ -79,7 +79,7 @@ export function installInstanceLauncher(instance, sourceRoot = root, configName 
   const launcher = entry => `@echo off\r\nchcp 65001 >nul\r\nsetlocal\r\nset "MUSIC_APP_CONFIG=%~dp0${configName}"\r\ncall "${sourcePath}\\${entry}" %*\r\nexit /b %errorlevel%\r\n`;
   const serviceLauncher = `@echo off\r\nchcp 65001 >nul\r\nsetlocal\r\nset "MUSIC_APP_CONFIG=%~dp0${configName}"\r\nnode "${sourcePath}\\scripts\\launch.mjs" %*\r\nif errorlevel 1 pause\r\nexit /b %errorlevel%\r\n`;
   const desktopLauncher = `@echo off\r\nchcp 65001 >nul\r\nsetlocal\r\nset "MUSIC_APP_CONFIG="\r\ncall "${sourcePath}\\一键启动.cmd" %*\r\nexit /b %errorlevel%\r\n`;
-  const desktopRestart = `@echo off\r\nchcp 65001 >nul\r\nsetlocal\r\nset "MUSIC_APP_CONFIG="\r\nnode "${sourcePath}\\scripts\\desktop.mjs" --detach --restart %*\r\nset "SLOWTUNE_EXIT=%errorlevel%"\r\nif not "%SLOWTUNE_EXIT%"=="0" pause\r\nexit /b %SLOWTUNE_EXIT%\r\n`;
+  const desktopRestart = `@echo off\r\nchcp 65001 >nul\r\nsetlocal\r\nset "MUSIC_APP_CONFIG="\r\nnode "${sourcePath}\\scripts\\desktop.mjs" --detach --restart %*\r\nset "BIBIMUSIC_EXIT=%errorlevel%"\r\nif not "%BIBIMUSIC_EXIT%"=="0" pause\r\nexit /b %BIBIMUSIC_EXIT%\r\n`;
   const entries = { '一键启动.cmd': serviceLauncher, '桌面启动.cmd': desktopLauncher, '重建并启动桌面.cmd': desktopRestart };
   const alias = entry => `@echo off\r\ncall "%~dp0${entry}" %*\r\nexit /b %errorlevel%\r\n`;
   const legacy = {
@@ -214,5 +214,5 @@ export async function updateInstance({ noOpen = false } = {}) {
 if (import.meta.main) {
   const args = process.argv.slice(2);
   if (args.some(value => value !== '--no-open')) { console.error('仅支持 --no-open（更新但不打开浏览器）。'); process.exitCode = 1; }
-  else updateInstance({ noOpen: args.includes('--no-open') }).catch(error => { console.error('慢听更新失败：' + error.message); process.exitCode = 1; });
+  else updateInstance({ noOpen: args.includes('--no-open') }).catch(error => { console.error('哔哔音乐更新失败：' + error.message); process.exitCode = 1; });
 }

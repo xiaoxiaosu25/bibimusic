@@ -5,8 +5,8 @@ const sizes = new Map<string, number>();
 const encoder = new TextEncoder();
 let desktopBytes = 2;
 export async function initializePreferenceStorage() {
-  if (window.slowTuneDesktop) {
-    desktopValues = await window.slowTuneDesktop.readPreferences();
+  if (window.biBiMusicDesktop) {
+    desktopValues = await window.biBiMusicDesktop.readPreferences();
     sizes.clear(); desktopBytes = 2;
     for (const [key, value] of Object.entries(desktopValues)) { const size = entrySize(key, value); sizes.set(key, size); desktopBytes += size; }
   }
@@ -20,7 +20,7 @@ function write(key: string, value: string | null) {
   if (value === null) { delete desktopValues![key]; sizes.delete(key); }
   else { desktopValues![key] = value; sizes.set(key, size); }
   desktopBytes = total;
-  void window.slowTuneDesktop!.writePreference(key, value).catch(() => window.dispatchEvent(new Event('desktop-preference-error')));
+  void window.biBiMusicDesktop!.writePreference(key, value).catch(() => window.dispatchEvent(new Event('desktop-preference-error')));
 }
 const desktopStorage: Storage = {
   get length() { return Object.keys(desktopValues ?? {}).length; },
@@ -31,7 +31,7 @@ const desktopStorage: Storage = {
   clear() { for (const key of Object.keys(desktopValues ?? {})) desktopStorage.removeItem(key); },
 };
 export function preferenceStorage(): Storage {
-  if (!window.slowTuneDesktop) return window.localStorage;
+  if (!window.biBiMusicDesktop) return window.localStorage;
   if (!desktopValues) throw new Error('本地偏好尚未准备完成。');
   return desktopStorage;
 }

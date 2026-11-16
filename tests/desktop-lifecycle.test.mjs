@@ -43,8 +43,8 @@ test('desktop isolates the server edition, preserves data and preferences across
   assert.equal(await application.evaluate(({ app }) => app.getPath('userData')), join(data, 'profile'));
   const stateFile = resolve(dirname(ownFile), ownConfig.runtimeDirectory, 'service.json'), first = JSON.parse(readFileSync(stateFile)); assert.notEqual(first.pid, server.pid);
   const saved = await page.evaluate(async () => {
-    window.slowTuneDesktop.writePreference('slow-listening:theme:v1', 'dark');
-    window.slowTuneDesktop.writePreference('slow-listening:youtube-music:region:v1', 'JP');
+    window.biBiMusicDesktop.writePreference('slow-listening:theme:v1', 'dark');
+    window.biBiMusicDesktop.writePreference('slow-listening:youtube-music:region:v1', 'JP');
     const current = await fetch('/api/song-library').then(response => response.json());
     return fetch('/api/song-library/edits', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Music-App': '1' }, body: JSON.stringify({ revision: current.revision, edits: [{ type: 'create-playlist', name: '独立桌面歌单' }] }) }).then(response => response.json());
   });
@@ -60,7 +60,7 @@ test('desktop isolates the server edition, preserves data and preferences across
   occupied = createServer(); await new Promise(done => occupied.listen(desktopPort, '127.0.0.1', done));
   application = await launch(); const reopened = await player(application); assert.notEqual(Number(new URL(reopened.url()).port), desktopPort);
   assert.equal(await reopened.evaluate(() => document.documentElement.dataset.theme), 'dark');
-  assert.equal(await reopened.evaluate(() => window.slowTuneDesktop.readPreferences().then(values => values['slow-listening:youtube-music:region:v1'])), 'JP');
+  assert.equal(await reopened.evaluate(() => window.biBiMusicDesktop.readPreferences().then(values => values['slow-listening:youtube-music:region:v1'])), 'JP');
   assert.deepEqual(await reopened.evaluate(() => fetch('/api/song-library').then(response => response.json())), saved);
   await closeDesktop(application); application = undefined; await new Promise(done => occupied.close(done)); occupied = undefined;
   const moved = join(directory, 'moved data'); renameSync(data, moved); env.MUSIC_APP_DESKTOP_DATA = moved;

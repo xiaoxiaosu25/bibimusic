@@ -1,4 +1,4 @@
-const api = window.slowTuneSetup;
+const api = window.biBiMusicSetup;
 let revealGeneration = 0;
 async function confirmVisible(generation) {
   await Promise.all([...document.querySelectorAll('img')].filter(image => !image.hidden).map(image => image.decode().catch(() => {})));
@@ -8,7 +8,7 @@ async function confirmVisible(generation) {
   while (document.hidden && generation === revealGeneration) await new Promise(done => document.addEventListener('visibilitychange', done, { once: true }));
   await new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done)));
   if (generation !== revealGeneration) return;
-  performance.mark('slowtune:welcome-visible');
+  performance.mark('bibimusic:welcome-visible');
   api.ready();
 }
 function render(state) {
@@ -20,7 +20,7 @@ function render(state) {
   document.body.dataset.artwork = String(!background.hidden);
   if (!background.hidden) background.src = state.welcome.image;
   background.style.objectPosition = `${settings?.desktopFocus?.x ?? 50}% ${settings?.desktopFocus?.y ?? 50}%`;
-  document.querySelector('#shade').style.opacity = background.hidden ? '0' : String((settings?.shade ?? 22) / 100);
+  document.querySelector('#shade').style.opacity = background.hidden ? '0' : String((settings?.shade ?? 8) / 100);
   document.querySelector('#status').textContent = state.message;
   document.querySelector('.startup-actions').hidden = state.phase !== 'error';
   document.querySelector('#retry').disabled = state.phase === 'starting';

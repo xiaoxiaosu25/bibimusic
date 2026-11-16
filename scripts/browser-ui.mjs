@@ -119,7 +119,7 @@ export async function openSettingsPage(page, section = '外观') {
     const profile=page.getByRole('region',{name:'我的',exact:true});
     if(section==='B站账号')await profile.locator('.mobile-profile-account').click();
     else {
-      const name=({'外观':'外观与主题','诊断与数据':'数据与诊断','关于与声明':'关于慢听'})[section]??section;
+      const name=({'外观':'外观与主题','诊断与数据':'数据与诊断','关于与声明':'关于哔哔音乐'})[section]??section;
       await profile.locator('.mobile-profile-links>button').filter({hasText:name}).click();
     }
     await page.locator('.mobile-settings:not([hidden])').waitFor();

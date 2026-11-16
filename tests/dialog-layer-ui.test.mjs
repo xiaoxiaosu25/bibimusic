@@ -121,13 +121,13 @@ test('rename owns Space and Escape without toggling playback or leaving the play
 
 test('mobile Back closes rename before leaving the playlist', async t => {
   const { page, library } = await openPlaylist(t, true);
-  const route = await page.evaluate(() => history.state.slowTuneMobileNavigation.page);
+  const route = await page.evaluate(() => history.state.biBiMusicMobileNavigation.page);
   const dialog = await openRename(page);
-  await page.waitForFunction(() => history.state?.slowTuneMobileNavigation?.layers.length === 1);
+  await page.waitForFunction(() => history.state?.biBiMusicMobileNavigation?.layers.length === 1);
   await page.evaluate(() => history.back());
   await dialog.waitFor({ state: 'detached' });
   await library.getByRole('heading', { name: playlistName, exact: true }).waitFor();
-  assert.equal(await page.evaluate(() => history.state.slowTuneMobileNavigation.page), route);
+  assert.equal(await page.evaluate(() => history.state.biBiMusicMobileNavigation.page), route);
   await page.evaluate(() => history.back());
   await page.getByRole('region', { name: '音乐库', exact: true }).waitFor();
   assert.equal(await dialog.count(), 0);
@@ -202,18 +202,18 @@ test('delete focuses Cancel, restores the menu origin and can retry a failed wri
 
 test('mobile Back closes delete without reopening the management sheet', async t => {
   const { page, library } = await openPlaylist(t, true);
-  const route = await page.evaluate(() => history.state.slowTuneMobileNavigation.page);
+  const route = await page.evaluate(() => history.state.biBiMusicMobileNavigation.page);
   await libraryAction(page, '删除歌单');
   const dialog = page.getByRole('dialog', { name: '删除歌单', exact: true });
   await dialog.waitFor();
   assert.equal(await dialog.getAttribute('data-layer'), 'dialog');
   assert(await active(dialog.getByRole('button', { name: '取消', exact: true })));
-  await page.waitForFunction(() => history.state?.slowTuneMobileNavigation?.layers.length === 1);
+  await page.waitForFunction(() => history.state?.biBiMusicMobileNavigation?.layers.length === 1);
   await page.evaluate(() => history.back());
   await dialog.waitFor({ state: 'detached' });
   assert.equal(await page.getByRole('dialog', { name: '歌单管理', exact: true }).count(), 0);
   await library.getByRole('heading', { name: playlistName, exact: true }).waitFor();
-  assert.equal(await page.evaluate(() => history.state.slowTuneMobileNavigation.page), route);
+  assert.equal(await page.evaluate(() => history.state.biBiMusicMobileNavigation.page), route);
   await page.evaluate(() => history.back());
   await page.getByRole('region', { name: '音乐库', exact: true }).waitFor();
 });

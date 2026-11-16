@@ -6,7 +6,7 @@ import { mobilePageSuspended, suspendMobilePages } from './mobile-pages';
 import { closeLayer, openLayers } from './ui/layers';
 
 type Entry = { session: string; id: number; key: string; page: string; layers: number[]; scroll: number; suspendedReaders?: number[]; readers?: string[] };
-const stateKey = 'slowTuneMobileNavigation';
+const stateKey = 'biBiMusicMobileNavigation';
 const pages = new Set(['discover', 'charts', 'follows', 'library', 'profile', 'settings', 'playing', 'search']);
 const validPage = (page: unknown): page is string => typeof page === 'string' && (pages.has(page) || !!mobileSettingsSection(page) || !!mobilePlaylistId(page) || !!readMobileFollowView(page));
 export function readMobileNavigationPage() {

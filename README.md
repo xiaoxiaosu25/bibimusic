@@ -1,51 +1,53 @@
-<h1 align="center">慢听 SlowTune</h1>
+<h1 align="center">哔哔音乐 BiBiMusic</h1>
 
-<p align="center"><strong>发现喜欢的音乐，留下想听的版本。</strong></p>
+<p align="center"><strong>发现 B站音乐，收藏喜欢的版本。</strong></p>
 
-<p align="center">面向 Windows 的个人音乐播放器：搜索和收听 B站（哔哩哔哩 / Bilibili）与 YouTube 的音乐，用歌单整理喜欢的歌曲和版本，搭配沉浸歌词与桌面悬浮歌词。</p>
+<p align="center">以 B站（哔哩哔哩 / Bilibili）为核心的个人音乐播放器：发现音乐、关注 UP 主更新、挑选歌曲版本，用歌单整理收藏，搭配同步歌词与桌面悬浮歌词。主要面向 Windows，并提供可连接服务版的手机网页。</p>
 
-<p align="center">YouTube 默认关闭，启用需配置网络和取源工具。</p>
+<p align="center">YouTube 为可选来源，默认关闭；启用需配置网络和取源工具。</p>
 
 <p align="center">
-  <a href="https://github.com/xiaoxiaosu25/slowtune/releases/latest"><img alt="最新版本" src="https://img.shields.io/github/v/release/xiaoxiaosu25/slowtune?label=version&amp;color=a92e32"></a>
-  <a href="https://github.com/xiaoxiaosu25/slowtune/releases"><img alt="Windows x64" src="https://img.shields.io/badge/Windows-x64-365e8d"></a>
+  <a href="https://github.com/xiaoxiaosu25/bibimusic/releases/latest"><img alt="最新版本" src="https://img.shields.io/github/v/release/xiaoxiaosu25/bibimusic?label=version&amp;color=a92e32"></a>
+  <a href="https://github.com/xiaoxiaosu25/bibimusic/releases"><img alt="Windows x64" src="https://img.shields.io/badge/Windows-x64-365e8d"></a>
   <a href="LICENSE"><img alt="AGPL-3.0-only" src="https://img.shields.io/badge/license-AGPL--3.0--only-60734b"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/xiaoxiaosu25/slowtune/releases/download/v0.1.34/SlowTune-0.1.34-windows-x64.zip"><strong>下载 Windows x64</strong></a> ·
-  <a href="https://github.com/xiaoxiaosu25/slowtune/releases">所有版本与更新记录</a> ·
+  <a href="https://github.com/xiaoxiaosu25/bibimusic/releases/download/v0.1.35/BiBiMusic-0.1.35-windows-x64.zip"><strong>下载 Windows x64</strong></a> ·
+  <a href="https://github.com/xiaoxiaosu25/bibimusic/releases">所有版本与更新记录</a> ·
   <a href="#界面预览">界面预览</a> ·
   <a href="#功能">功能</a> ·
   <a href="#移动网页">手机网页</a> ·
   <a href="#源码启动">源码启动</a> ·
-  <a href="https://github.com/xiaoxiaosu25/slowtune/issues">反馈问题</a>
+  <a href="https://github.com/xiaoxiaosu25/bibimusic/issues">反馈问题</a>
 </p>
 
-![慢听实际播放 Winky诗《松烟入墨》：黑红唱片、B站来源、音质信息、歌词与播放控制](docs/images/player.jpg)
+![哔哔音乐实际播放 Winky诗《松烟入墨》：黑红唱片、B站来源、音质信息、歌词与播放控制](docs/images/player.jpg)
 
 <p align="center"><em>《松烟入墨》· Winky诗，真实 B站来源播放画面。</em></p>
 
-**Windows x64 免安装版，解压后双击 `SlowTune.exe`，无需另装 Node.js。** [下载与启动](#下载-windows-版) · [支持范围与当前限制](docs/产品/当前限制.md)
+**Windows x64 免安装版，解压后双击 `BiBiMusic.exe`，无需另装 Node.js。** [下载与启动](#下载-windows-版) · [支持范围与当前限制](docs/产品/当前限制.md)
 
 ## 功能
 
 | 功能 | 可以做什么 |
 | --- | --- |
-| 发现与搜索 | 浏览 B站推荐、应用内关注更新，按歌名／歌手搜索，或粘贴支持的来源链接 |
-| 多平台榜单 | 查看网易云、QQ、B站与 Apple Music 榜单，从支持的视频来源匹配播放，也可手动挑选版本 |
-| 播放展示 | 切换唱片、方形、慢转圆形、横向音波与圆形音环，音波跟随真实音频频谱 |
-| 沉浸与悬浮歌词 | 自动匹配、手动选择、导入 LRC／文本和时间校准；Windows 独立程序支持桌面悬浮歌词 |
+| B站音乐发现 | 浏览 B站推荐，按歌名／歌手搜索，或粘贴 BV 号、视频和公开歌单链接 |
+| UP 主与收藏夹 | 在应用内关注 UP 主并查看投稿更新；B站扫码登录与收藏夹关联 |
 | 歌单与歌曲多版本 | 收藏与自建歌单，封面、搜索、排序和重排；同一首歌可保留多个版本，设置默认版本或歌单固定版本 |
-| 队列与播放控制 | 顺序、随机、列表／单曲循环，队列重排、倍速、进度、音量与快进退 |
-| 睡眠定时 | 倒计时、自然播完 N 首或播完当前曲；结束时暂停、停止，Windows 独立程序还可退出慢听 |
-| 外观与资料 | 四套配色、明暗模式、自定义欢迎页；B站扫码登录与收藏夹关联，歌单 JSON 导入导出 |
+| 同步与悬浮歌词 | 自动匹配、手动选择、导入 LRC／文本和时间校准；支持沉浸阅读，Windows 独立程序支持桌面悬浮歌词 |
+| 榜单发现与版本匹配 | 查看网易云、QQ、B站与 Apple Music 榜单，从 B站等已启用来源匹配播放，也可手动挑选版本 |
+| 队列与播放控制 | 顺序、随机、列表／单曲循环，分 P 队列折叠与按组随机，队列重排、倍速、进度、音量与快进退 |
+| 音质与音轨 | 保存自动（无损优先）、兼容优先或省流量偏好，查看来源规格，切换当前音轨并保留进度 |
+| 播放展示 | 切换唱片、方形、圆形、横向音波与圆形音环，音波跟随真实音频频谱 |
+| 睡眠定时 | 倒计时、自然播完 N 首或播完当前曲；结束时暂停、停止，Windows 独立程序还可退出哔哔音乐 |
+| 外观与资料 | 四套配色、明暗模式、自定义欢迎页；歌单 JSON 导入导出 |
 
-榜单用于发现歌曲，播放时从 B站等支持的视频来源匹配或挑选版本。完整操作说明见[产品功能](docs/产品/产品功能.md)。YouTube 可按需启用，默认关闭，需另行配置网络与取源工具。
+B站提供主要的搜索、推荐和播放内容；其他平台的榜单用于发现歌曲，歌词由网易云、LRCLIB 或用户导入提供。音质取决于来源提供的音轨与客户端能力，真实 FLAC／杜比及实体输出的验收边界见[当前限制](docs/产品/当前限制.md)。来源分工与完整操作见[产品功能](docs/产品/产品功能.md)。
 
 ## 界面预览
 
-截图来自实际运行的服务网页，点击可看大图。PC 网页显示底部歌词，Windows 程序使用桌面悬浮歌词。
+截图来自当前源码运行的隔离服务网页，使用真实 B站来源、搜索和榜单响应，点击可看大图。PC 网页显示底部歌词，Windows 程序使用桌面悬浮歌词。
 
 | 沉浸歌词 | 收藏与歌单 |
 | :---: | :---: |
@@ -54,7 +56,7 @@
 
 | 搜索喜欢的版本 | 多平台音乐榜单 |
 | :---: | :---: |
-| [![许嵩的真实 B站搜索结果、分 P 信息与筛选说明](docs/images/search.jpg)](docs/images/search.jpg) | [![网易云热歌榜真实歌曲、歌手、封面与来源更新时间](docs/images/charts.jpg)](docs/images/charts.jpg) |
+| [![许嵩的真实 B站搜索结果、分 P 信息与筛选说明](docs/images/search.jpg)](docs/images/search.jpg) | [![B站热歌榜真实歌曲、歌手、封面与来源更新时间](docs/images/charts.jpg)](docs/images/charts.jpg) |
 | 保留来源结果与分 P 信息，筛选偏好可调整，听之前先挑喜欢的版本。 | 单首点播或播放整榜，收藏歌曲，也能打开搜索选择其他版本。 |
 
 | 睡眠定时 | 外观与主题 |
@@ -74,15 +76,15 @@
 
 ## 下载 Windows 版
 
-1. [下载 Windows x64 ZIP](https://github.com/xiaoxiaosu25/slowtune/releases/download/v0.1.34/SlowTune-0.1.34-windows-x64.zip)；其他版本及更新说明见 [Releases](https://github.com/xiaoxiaosu25/slowtune/releases)。
-2. 将 `SlowTune-<版本>-windows-x64.zip` 完整解压到当前用户可写的目录。
-3. 双击 `SlowTune.exe`，欢迎页结束后即可进入，无需另装 Node.js。
+1. [下载 Windows x64 ZIP](https://github.com/xiaoxiaosu25/bibimusic/releases/download/v0.1.35/BiBiMusic-0.1.35-windows-x64.zip)；其他版本及更新说明见 [Releases](https://github.com/xiaoxiaosu25/bibimusic/releases)。
+2. 将 `BiBiMusic-<版本>-windows-x64.zip` 完整解压到当前用户可写的目录。
+3. 双击 `BiBiMusic.exe`，欢迎页结束后即可进入，无需另装 Node.js。
 
-下载包对应已发布版本，功能与变更见对应 Release；源码分支可能包含尚未发布的调整。
+项目现名为哔哔音乐 BiBiMusic，原名慢听 SlowTune。当前程序、源码与仓库首页使用统一品牌；具体版本的功能与变更见对应 Release。
 
 请保留完整解压目录。GitHub 自动生成的 `Source code.zip` 是源码，不能直接作为程序运行。
 
-**更新与备份：** 先退出慢听，备份并保留 `SlowTune.exe` 同级的整个 `data/` 文件夹。完整解压新版本后保留自己的资料，具体方法见[更新与恢复](docs/运维/运行维护.md#更新与恢复)。
+**更新与备份：** 先退出正在运行的程序，备份并保留 EXE 同级的整个 `data/` 文件夹。完整解压新版本后保留自己的资料，具体方法见[更新与恢复](docs/运维/运行维护.md#更新与恢复)。
 
 当前程序未签名，没有安装器或自动更新；设备验证范围见[当前限制](docs/产品/当前限制.md)。
 
@@ -98,8 +100,8 @@
 需要 Windows、Git 和 Node.js `>=24.15.0`（含 npm）。
 
 ```powershell
-git clone https://github.com/xiaoxiaosu25/slowtune.git
-cd slowtune
+git clone https://github.com/xiaoxiaosu25/bibimusic.git
+cd bibimusic
 npm ci
 npm run desktop:build
 npm run desktop
@@ -109,7 +111,7 @@ npm run desktop
 
 ## 参与贡献
 
-欢迎通过 [Issues](https://github.com/xiaoxiaosu25/slowtune/issues) 反馈问题或提出建议，通过 Pull Request 改进代码和文档。
+欢迎通过 [Issues](https://github.com/xiaoxiaosu25/bibimusic/issues) 反馈问题或提出建议，通过 Pull Request 改进代码和文档。
 
 开发环境、代码目录和提交说明见[贡献指南](CONTRIBUTING.md)，其他文档见[文档导航](docs/文档导航.md)。
 

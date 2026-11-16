@@ -21,8 +21,8 @@ const idleAnalysis = () => 'idle' as const;
 function VinylLabel() {
   return <>
     <span className="vinyl-label">
-      <span className="vinyl-label-brand">SLOWTUNE</span>
-      <span className="vinyl-label-title">慢 听</span>
+      <span className="vinyl-label-brand">BIBIMUSIC</span>
+      <span className="vinyl-label-title">哔 哔</span>
       <span className="vinyl-label-side">SIDE A <span>33⅓ RPM</span></span>
       <span className="vinyl-label-edition">STEREO · ORIGINAL RECORDING</span>
     </span>

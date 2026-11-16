@@ -26,7 +26,7 @@ export function AccessSettings({onChanged}:{onChanged:()=>void}) {
     }catch(issue){setError(errorText(issue));}finally{setBusy(false);}
   };
   return <div className="settings-stack access-settings">
-    <header className="settings-section-heading"><div><h3>启动与访问</h3><p className="muted">决定如何进入慢听，也可以在这里修改私人访问码。</p></div><LockKeyIcon size={25}/></header>
+    <header className="settings-section-heading"><div><h3>启动与访问</h3><p className="muted">决定如何进入哔哔音乐，也可以在这里修改私人访问码。</p></div><LockKeyIcon size={25}/></header>
     {!state?<><p role="status">{error||'正在读取访问设置…'}</p>{error&&<Button variant="secondary"  onClick={()=>void read()}>重新读取</Button>}</>:<form className="settings-stack" onSubmit={event=>{event.preventDefault();void save();}}>
       <section className="settings-group settings-stack"><h4>进入方式</h4><label className="choice"><input type="checkbox" checked={required} disabled={busy} onChange={event=>{setRequired(event.target.checked);setMessage('');}}/>进入时验证访问码</label><p className="muted">{required?'没有有效会话时，需要输入访问码。已验证的浏览器会自动连接。':'连接此服务的设备可直接进入，共用歌单、收藏和来源账号。'}</p><p className="muted">欢迎页至少展示约 1.5 秒，同时准备歌单、收藏和首页内容，准备好后自动进入。</p>
         <AccessCodeField label="当前访问码" value={current} onChange={setCurrent} autoComplete="current-password" required disabled={busy}/>
