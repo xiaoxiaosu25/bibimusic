@@ -37,7 +37,7 @@ test('Product HTTP authentication, conditional transactions, failed import/stora
     assert.equal((await req('/api/comments',{})).status,405);
     const status=(await req('/api/status')).data;
     assert.equal(status.providers.youtube.available,false);
-    assert.deepEqual(status.brand,{name:'哔哔音乐',english:'BiBiMusic',id:'bibimusic',tagline:'发现声音，把喜欢留在这里。'});
+    assert.deepEqual(status.brand,{name:'哔哔音乐',english:'BiBiMusic',id:'bibimusic',tagline:'发现 B站音乐，收藏喜欢的版本。'});
     const sourceSettings=(await req('/api/settings/sources')).data;
     assert.equal(sourceSettings.youtube.enabled,false);assert.equal(sourceSettings.youtube.disabledDisplay,'dim');
     assert.equal((await req('/api/settings/sources',{revision:sourceSettings.revision,youtube:{enabled:'yes',disabledDisplay:'dim'}})).status,400);

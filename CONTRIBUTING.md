@@ -4,7 +4,7 @@
 
 ## 反馈问题
 
-先搜索 [Issues](https://github.com/xiaoxiaosu25/slowtune/issues)。提供应用版本、使用端、系统／浏览器版本、复现步骤及预期／实际结果；布局问题附窗口尺寸。Windows 运行故障可附「运行信息 → 复制诊断信息」。
+先搜索 [Issues](https://github.com/xiaoxiaosu25/bibimusic/issues)。提供应用版本、使用端、系统／浏览器版本、复现步骤及预期／实际结果；布局问题附窗口尺寸。Windows 运行故障可附「运行信息 → 复制诊断信息」。
 
 附件去除凭据、账号二维码、私人路径和媒体签名地址，不上传完整资料目录、私人配置或原始日志。
 

@@ -36,7 +36,7 @@ export function AboutPanel({ active, status }: { active: boolean; status?: Serve
   const openSource = notices?.entries;
   return <div className="about-settings settings-stack">
     <header className="settings-section-heading">
-      <div><h3 tabIndex={-1} data-about-heading>关于与声明</h3><p className="muted">哔哔音乐 BiBiMusic · {desktop ? 'Windows 桌面个人音乐应用' : '个人音乐网页工具'}</p></div>
+      <div><h3 tabIndex={-1} data-about-heading>关于与声明</h3><p className="muted">哔哔音乐 BiBiMusic · {desktop ? 'Windows 桌面 B站音乐播放器' : 'B站音乐网页播放器'}</p></div>
       {(status?.version || notices?.appVersion) && <span className="settings-version">应用 {status?.version ?? notices?.appVersion}</span>}
     </header>
     <p className="muted">本应用为独立第三方工具，与哔哩哔哩、YouTube 及相关权利人无官方隶属或背书关系。</p>
@@ -106,7 +106,7 @@ export function AboutPanel({ active, status }: { active: boolean; status?: Serve
           </details>
         </li>)}</ul>
       </details>}
-      <a className="btn btn-secondary" href="/legal/THIRD-PARTY-NOTICES.txt" download="slow-listening-third-party-notices.txt">下载第三方许可全文</a>
+      <a className="btn btn-secondary" href="/legal/THIRD-PARTY-NOTICES.txt" download="bibimusic-third-party-notices.txt">下载第三方许可全文</a>
       <details className="settings-details"><summary>yt-dlp 等外部工具许可</summary>
         <p>yt-dlp、其 EJS 依赖及运行环境{desktop ? '需要在本机另行配置' : '由服务宿主提供'}，未随本应用分发。yt-dlp 的源码与不同可执行发行物可能适用不同许可；应以实际安装版本和发行物所附许可为准。</p>
         <p className="muted">{status?.providers.youtube.toolVersion ? `当前${desktop ? '本机' : '服务'}报告 yt-dlp ${status.providers.youtube.toolVersion}。` : '当前未取得 yt-dlp 工具版本。'} <a href="https://github.com/yt-dlp/yt-dlp#licensing" target="_blank" rel="noreferrer">查看 yt-dlp 上游许可说明</a></p>

@@ -14,14 +14,34 @@
   <main class="startup-main">
     <div class="startup-stack">
       <section class="startup-brand" aria-label="哔哔音乐启动页">
-        <img class="startup-mark" src="mark.svg" alt="">
-        <h1>哔哔音乐</h1>
-        <p class="startup-tagline">留一点时间，听见喜欢。</p>
+        <div class="startup-emblem-wrap">
+          <div class="startup-glow" aria-hidden="true"></div>
+          <img class="startup-mark" src="mark.svg" alt="哔哔音乐">
+        </div>
+        <div class="startup-title-group">
+          <h1>哔哔音乐</h1>
+          <span class="startup-pill">BiBi</span>
+        </div>
+        <p class="startup-tagline">发现 B站音乐，收藏喜欢的版本。</p>
       </section>
       <footer class="startup-footer">
+        <div class="startup-tuner" aria-hidden="true">
+          <div class="startup-waves">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
         <div class="startup-loader" aria-hidden="true"><span></span></div>
-        <div id="status" class="startup-status" role="status" aria-live="polite">正在准备你的音乐…</div>
-        <div class="startup-actions" hidden><button id="retry">重试</button><button id="data" class="secondary">打开资料文件夹</button><button id="logs" class="secondary">打开日志文件夹</button><button id="quit" class="quiet">退出</button></div>
+        <div class="startup-status-box">
+          <span class="startup-pulse-dot" aria-hidden="true"></span>
+          <div id="status" class="startup-status" role="status" aria-live="polite">正在准备你的音乐…</div>
+        </div>
+        <div class="startup-actions" hidden>
+          <button id="retry">重试</button>
+          <button id="data" class="secondary">打开资料文件夹</button>
+          <button id="logs" class="secondary">打开日志文件夹</button>
+          <button id="quit" class="quiet">退出</button>
+        </div>
+        <p class="startup-caption">搜索音乐 · 选择版本 · 整理歌单</p>
       </footer>
     </div>
   </main>

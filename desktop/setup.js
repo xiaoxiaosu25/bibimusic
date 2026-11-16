@@ -20,7 +20,7 @@ function render(state) {
   document.body.dataset.artwork = String(!background.hidden);
   if (!background.hidden) background.src = state.welcome.image;
   background.style.objectPosition = `${settings?.desktopFocus?.x ?? 50}% ${settings?.desktopFocus?.y ?? 50}%`;
-  document.querySelector('#shade').style.opacity = background.hidden ? '0' : String((settings?.shade ?? 22) / 100);
+  document.querySelector('#shade').style.opacity = background.hidden ? '0' : String((settings?.shade ?? 8) / 100);
   document.querySelector('#status').textContent = state.message;
   document.querySelector('.startup-actions').hidden = state.phase !== 'error';
   document.querySelector('#retry').disabled = state.phase === 'starting';

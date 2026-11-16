@@ -267,7 +267,13 @@ async function start() {
   const setupState = () => {
     let welcome;
     try { welcome = JSON.parse(readFileSync(join(dataDirectory, 'welcome.json'), 'utf8')); } catch {}
-    if (!welcome?.image) { try { welcome = { ...welcome, image: 'data:image/png;base64,' + readFileSync(join(serviceRoot, 'dist/client/assets/coast.png')).toString('base64') }; } catch {} }
+    // Built-in artwork belongs to the current build, not to the persisted custom-image cache.
+    if (welcome?.settings?.background !== 'custom' || !welcome?.image) {
+      welcome = { ...welcome, settings: welcome?.settings ?? { background: 'builtin', desktopFocus: { x: 50, y: 50 }, shade: 8 }, image: undefined };
+      if (welcome.settings.background !== 'plain') {
+        try { welcome.image = 'data:image/png;base64,' + readFileSync(join(serviceRoot, 'dist/client/assets/welcome-listening-desk.png')).toString('base64'); } catch {}
+      }
+    }
     return { ...status, retryLabel: exitRecovery ? '重试保存并退出' : '重试', theme: appearance.theme, welcome };
   };
   function openSetup(phase = 'starting', message = '') {

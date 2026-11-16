@@ -10,7 +10,7 @@ export const deliveryDocuments = [
 export function copyDeliveryDocuments(root, target) {
   root = resolve(root); target = resolve(target);
   const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
-  const repository = (typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url) ?? 'https://github.com/xiaoxiaosu25/slowtune';
+  const repository = (typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url) ?? 'https://github.com/xiaoxiaosu25/bibimusic';
   const base = repository.replace(/^git\+/, '').replace(/\.git$/, '') + '/blob/main/';
   const documents = deliveryDocuments.filter(file => existsSync(join(root, file)));
   for (const file of documents) {

@@ -9,4 +9,5 @@ export interface WelcomeSettings {
 export interface WelcomeState { revision: string; welcome: WelcomeSettings }
 export interface BootstrapState extends WelcomeState { authenticationRequired: boolean; authenticated: boolean }
 export interface AccessState { revision: string; authenticationRequired: boolean }
-export const defaultWelcome = (): WelcomeSettings => ({ background: 'builtin', desktopFocus: { x: 50, y: 50 }, mobileFocus: { x: 36, y: 50 }, shade: 22, position: 'right' });
+export const builtinWelcomeImage = '/assets/welcome-listening-desk.png';
+export const defaultWelcome = (): WelcomeSettings => ({ background: 'builtin', desktopFocus: { x: 50, y: 50 }, mobileFocus: { x: 16, y: 50 }, shade: 8, position: 'right' });
