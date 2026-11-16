@@ -14,18 +14,18 @@ export function DesktopStartup({ settings, message, error, onRetry }: { settings
   return <div className="desktop-startup" data-phase={error ? 'error' : 'starting'} data-position={settings.position} data-artwork={!!picture}>
     {picture && <img className="startup-background" src={picture} alt="" fetchPriority="high" style={{ objectPosition: `${settings.desktopFocus.x}% ${settings.desktopFocus.y}%` }} onError={() => setFailed(value => [...value, picture])} />}
     <div className="startup-shade" style={{ opacity: picture ? settings.shade / 100 : 0 } as CSSProperties}/><div className="startup-vignette"/>
-    <header className="startup-header">SLOWTUNE<span>音乐，慢慢听。</span></header>
+    <header className="startup-header">BIBIMUSIC<span>音乐，慢慢听。</span></header>
     <main className="startup-main">
-      <section className="startup-brand" aria-label="慢听启动页">
+      <section className="startup-brand" aria-label="哔哔音乐启动页">
         <img className="startup-mark" src={mark} alt=""/>
-        <h1>慢听</h1><p className="startup-wordmark">SLOWTUNE</p>
+        <h1>哔哔音乐</h1><p className="startup-wordmark">BIBIMUSIC</p>
         <p className="startup-tagline">留一点时间，听见喜欢。</p>
       </section>
     </main>
     <footer className="startup-footer">
       <div className="startup-loader" aria-hidden="true"><span/></div>
       <div className="startup-status" role={error ? 'alert' : 'status'} aria-live="polite">{message}</div>
-      {error && <div className="startup-actions"><Button variant="plain" onClick={onRetry}>重试</Button><Button variant="plain" className="secondary" onClick={() => void window.slowTuneDesktop?.openDirectory('logs')}>打开日志文件夹</Button><Button variant="plain" className="quiet" onClick={() => window.slowTuneDesktop?.quit()}>退出</Button></div>}
+      {error && <div className="startup-actions"><Button variant="plain" onClick={onRetry}>重试</Button><Button variant="plain" className="secondary" onClick={() => void window.biBiMusicDesktop?.openDirectory('logs')}>打开日志文件夹</Button><Button variant="plain" className="quiet" onClick={() => window.biBiMusicDesktop?.quit()}>退出</Button></div>}
       <p className="startup-caption">你的个人音乐空间</p>
     </footer>
   </div>;

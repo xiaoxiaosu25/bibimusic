@@ -101,7 +101,7 @@ export class StartupSettingsStore {
   image(id: string) { const row=this.db.prepare('SELECT mime,bytes FROM startup_image WHERE user=? AND id=?').get(this.user,id); return row?{mime:String(row.mime),bytes:row.bytes as Uint8Array}:undefined; }
   exportWelcome() {
     const {welcome}=this.welcome(),image=welcome.imageId?this.image(welcome.imageId):undefined;
-    return {format:'slowtune-welcome',version:1,welcome,...(image?{image:`data:${image.mime};base64,${Buffer.from(image.bytes).toString('base64')}`}:{})};
+    return {format:'bibimusic-welcome',version:1,welcome,...(image?{image:`data:${image.mime};base64,${Buffer.from(image.bytes).toString('base64')}`}:{})};
   }
   resetAccess(code: string) {
     if(!validCode(code))throw new StartupError('access-code-format');

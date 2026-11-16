@@ -1,4 +1,4 @@
-SlowTune
+BiBiMusic (formerly SlowTune)
 Copyright (C) 2026 SlowTune authors.
 
 Original code in this repository is licensed under the GNU Affero General

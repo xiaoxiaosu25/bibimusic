@@ -70,6 +70,7 @@ function context(value: unknown) {
   optional(value.upstreamSongId, v => text(v, 500)); optional(value.chart, v => oneOf(v, ['hot', 'new', 'rising', 'most-played']));
   optional(value.periodId, integer); optional(value.rank, integer); optional(value.sourceUrl, url); optional(value.artwork, url);
 }
+// This marker is also stored inside SQLite documents. Keep the current schema identity stable across branding changes.
 export const emptySongLibrary = (): SongLibrarySnapshot => ({ format: 'slowtune-library', version: 1, songs: [], versions: [], favorites: [], playlists: [], catalogLinks: [], redirects: [] });
 
 /** Browser-safe, strict boundary for untrusted JSON. Unknown/runtime fields are rejected at every level. */

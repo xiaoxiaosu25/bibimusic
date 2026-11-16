@@ -100,4 +100,4 @@ async function main(){
     throw new Error(`30 秒内未就绪。请查看 ${stderr}，确认运行状态后再试。`);
   }finally{if(ownsLock)try{unlinkSync(lock);}catch{}}
 }
-if(import.meta.main)main().catch(e=>{console.error('慢听启动失败：'+e.message);process.exitCode=1;});
+if(import.meta.main)main().catch(e=>{console.error('哔哔音乐启动失败：'+e.message);process.exitCode=1;});

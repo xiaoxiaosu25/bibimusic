@@ -43,7 +43,7 @@ export function SleepPanel({ timer, desktop = false }: { timer: SleepTimerContro
   };
   const presetActive = (minutes: number) => running && snapshot.action === 'pause' && snapshot.trigger?.type === 'duration' && snapshot.trigger.durationMs === minutes * 60000;
   const timerError = snapshot?.error ? '定时结束操作未完成，请重新设置或取消。' : '';
-  const labels = desktop ? { ...actionLabels, close: '退出慢听' } : actionLabels;
+  const labels = desktop ? { ...actionLabels, close: '退出哔哔音乐' } : actionLabels;
   const draftChanged = desktop && running && (trigger !== snapshot.trigger?.type || action !== snapshot.action
     || trigger === 'duration' && snapshot.trigger?.type === 'duration' && Number(duration) * Number(unit) !== snapshot.trigger.durationMs
     || trigger === 'items' && snapshot.trigger?.type === 'items' && Number(count) !== snapshot.trigger.count);
@@ -70,9 +70,9 @@ export function SleepPanel({ timer, desktop = false }: { timer: SleepTimerContro
           <label className="field"><span className="field-label">结束条件</span><select className="select" data-field="trigger" value={trigger} onChange={event => { setTrigger(event.target.value as SleepTimerTrigger['type']); setError(''); }}><option value="duration">倒计时</option><option value="items">自然播完 N 首</option><option value="current">播完当前曲</option></select></label>
           {trigger === 'duration' && <div className="sleep-duration"><label className="field"><span className="field-label">时长</span><input className="input" data-field="duration" type="number" min="0.001" step="any" required inputMode="decimal" value={duration} onChange={event => setDuration(event.target.value)} /></label><label className="field"><span className="field-label">单位</span><select className="select" data-field="unit" value={unit} onChange={event => setUnit(event.target.value)}><option value="60000">分钟</option><option value="1000">秒</option></select></label></div>}
           {trigger === 'items' && <label className="field"><span className="field-label">歌曲数量</span><input className="input" data-field="count" type="number" min="1" max={Number.MAX_SAFE_INTEGER} step="1" required inputMode="numeric" value={count} onChange={event => setCount(event.target.value)} /></label>}
-          <label className="field sleep-action"><span className="field-label">结束动作</span><select className="select" data-field="action" value={action} onChange={event => setAction(event.target.value as SleepTimerSnapshot['action'])}>{Object.entries(labels).filter(([value]) => !desktop || value !== 'close' || !!window.slowTuneDesktop).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label className="field sleep-action"><span className="field-label">结束动作</span><select className="select" data-field="action" value={action} onChange={event => setAction(event.target.value as SleepTimerSnapshot['action'])}>{Object.entries(labels).filter(([value]) => !desktop || value !== 'close' || !!window.biBiMusicDesktop).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
         </div>
-        <p className="muted sleep-hint">{trigger === 'duration' ? '暂停播放时，倒计时也会继续。' : trigger === 'items' ? `${desktop ? '包含当前曲剩余部分；' : ''}仅自然播完才计数，手动切歌或快进到末尾不计数。` : '等待当前曲自然播完；切歌后会等待新的当前曲。'} {desktop && action === 'close' ? '停止播放并退出慢听。' : actionHints[action]}</p>
+        <p className="muted sleep-hint">{trigger === 'duration' ? '暂停播放时，倒计时也会继续。' : trigger === 'items' ? `${desktop ? '包含当前曲剩余部分；' : ''}仅自然播完才计数，手动切歌或快进到末尾不计数。` : '等待当前曲自然播完；切歌后会等待新的当前曲。'} {desktop && action === 'close' ? '停止播放并退出哔哔音乐。' : actionHints[action]}</p>
         {draftChanged && <p className="muted sleep-hint" role="status">修改尚未生效，点击“应用设置”后替换当前定时。</p>}
         <div className="sleep-actions"><Button variant="primary" type="submit"  data-action="start-timer"><TimerIcon size={18} />{running ? desktop && draftChanged ? '应用设置' : '重新设置' : '开启定时'}</Button><Button variant="secondary" type="button"  data-action="cancel-timer" disabled={!running && !snapshot?.actionPending && !(desktop && snapshot?.error)} onClick={() => { timer?.cancel(); setError(''); }}>取消定时</Button></div>
       </fieldset>

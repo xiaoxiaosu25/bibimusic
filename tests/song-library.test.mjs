@@ -24,9 +24,9 @@ function fixture() {
   return { ...emptySongLibrary(), songs: [{ ...song(), defaultVersionId: 'v1' }, { ...song('s2'), title: '另一首', defaultVersionId: 'v2' }], versions: [version(), version('v2', 's2', '20')], favorites: [{ favoriteId: 'f1', songId: 's1', position: 0, addedAt: 30 }, { favoriteId: 'f2', songId: 's2', position: 1, addedAt: 5 }], playlists: [{ id: 'p1', name: '重复成员', createdAt: 1, updatedAt: 2, entries: [{ entryId: 'e1', songId: 's1', position: 0, addedAt: 1, pinnedVersionId: 'v1' }, { entryId: 'e2', songId: 's1', position: 1, addedAt: 2, pinnedVersionId: null }] }] };
 }
 async function setup(t) {
-  const directory = await mkdtemp(join(tmpdir(), 'slowtune-song-v1-')), path = join(directory, 'songs.sqlite');
+  const directory = await mkdtemp(join(tmpdir(), 'bibimusic-song-v1-')), path = join(directory, 'songs.sqlite');
   const stores = []; const open = (scope = 'alice') => { const store = new SongLibraryStore(path, scope, () => 100); stores.push(store); return new SongLibraryService(store, () => 100); };
-  t.after(async () => { for (const store of stores) store.close(); assert(directory.startsWith(join(tmpdir(), 'slowtune-song-v1-'))); await rm(directory, { recursive: true, force: true }); });
+  t.after(async () => { for (const store of stores) store.close(); assert(directory.startsWith(join(tmpdir(), 'bibimusic-song-v1-'))); await rm(directory, { recursive: true, force: true }); });
   return { path, open, directory };
 }
 function restore(service, data = fixture(), mode = 'replace', owner = 'browser') { const p = service.previewImport(owner, data, mode, service.read().revision); assert.deepEqual(p.impact.conflicts, []); return service.commitImport(owner, p.token, p.revision); }
@@ -37,6 +37,8 @@ function syncDocument(context) {
 
 test('strict new format roundtrip preserves manual fields, exact P, member IDs, pins, time and explicit order', () => {
   const original = fixture(), decoded = decode(encode(original)); assert.deepEqual(decoded, original); decoded.songs[0].title = 'mutated'; assert.equal(original.songs[0].title, '标准歌名');
+  assert.equal(original.format, 'slowtune-library', 'branding must not change the schema stored in existing SQLite documents');
+  assert.throws(() => decode({ ...original, format: 'unknown-library' }), { code: 'invalid-input' });
   assert.deepEqual(original.favorites.map(f => f.addedAt), [30, 5]);
   assert.throws(() => decode({ format: 'studio-music-library', version: 1, playlists: [], favorites: [] }), { code: 'invalid-input' });
   assert.throws(() => decode({ ...original, version: 2 }), { code: 'unknown-version' });
@@ -213,7 +215,7 @@ test('preview is session-owned, expiring, bounded, single-use, and cannot overwr
 
 test('HTTP requires identity, same origin and business header; directly reads new backup with CAS preview/commit', async t => {
   const { open } = await setup(t), service = open(), app = createSongLibraryRouter(service, c => c.req.header('Cookie') === 'session=valid' ? 'browser' : '');
-  const headers = { Cookie: 'session=valid', 'X-Music-App': '1', 'Content-Type': 'application/json', 'X-SlowTune-Revision': 'null' };
+  const headers = { Cookie: 'session=valid', 'X-Music-App': '1', 'Content-Type': 'application/json', 'X-BiBiMusic-Revision': 'null' };
   assert.equal((await app.request('/')).status, 401);
   assert.equal((await app.request('/edits', { method: 'POST', headers: { Cookie: 'session=valid' }, body: '{}' })).status, 403);
   assert.equal((await app.request('/edits', { method: 'POST', headers: { ...headers, Origin: 'https://foreign.invalid' }, body: '{}' })).status, 403);

@@ -71,8 +71,8 @@ test('cover HTTP writes require the desktop surface and keep the usual origin/re
   const library = setup(t), app = createSongLibraryRouter(library, () => 'browser');
   const body = JSON.stringify({ revision: library.revision(), edits: [{ type: 'set-playlist-cover', targetId: 'p', image: coverImage }] });
   assert.equal((await app.request('/edits', { method: 'POST', headers: { 'X-Music-App': '1' }, body })).status, 400);
-  assert.equal((await app.request('/edits', { method: 'POST', headers: { 'X-Music-App': '1', 'X-SlowTune-Surface': 'desktop', Origin: 'https://untrusted.invalid' }, body })).status, 403);
-  assert.equal((await app.request('/edits', { method: 'POST', headers: { 'X-Music-App': '1', 'X-SlowTune-Surface': 'desktop' }, body })).status, 200);
+  assert.equal((await app.request('/edits', { method: 'POST', headers: { 'X-Music-App': '1', 'X-BiBiMusic-Surface': 'desktop', Origin: 'https://untrusted.invalid' }, body })).status, 403);
+  assert.equal((await app.request('/edits', { method: 'POST', headers: { 'X-Music-App': '1', 'X-BiBiMusic-Surface': 'desktop' }, body })).status, 200);
   assert.equal((await app.request('/covers/source', { method: 'POST', headers: { 'X-Music-App': '1' }, body: '{}' })).status, 400);
 });
 

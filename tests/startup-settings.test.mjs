@@ -29,7 +29,7 @@ test('access codes are hashed, persistent, revision checked and scoped; welcome 
   assert.throws(()=>store.saveWelcome({revision:welcome.revision,welcome:{...defaultWelcome(),shade:200}}),{code:'invalid-input'});
   assert.throws(()=>decodeWelcomeImage('data:image/svg+xml;base64,PHN2Zz48L3N2Zz4='),{code:'welcome-image-invalid'});
   assert.throws(()=>decodeWelcomeImage('data:image/png;base64,'+Buffer.from('not an image').toString('base64')),{code:'welcome-image-invalid'});
-  const exported=store.exportWelcome();assert.equal(exported.image,image);assert(!JSON.stringify(exported).includes('private-code'));
+  const exported=store.exportWelcome();assert.equal(exported.format,'bibimusic-welcome');assert.equal(exported.version,1);assert.equal(exported.image,image);assert(!JSON.stringify(exported).includes('private-code'));
   store.close();store=new StartupSettingsStore(file,'personal','obsolete-config-code');assert(store.verify('new-private-code'));assert(!store.verify('obsolete-config-code'));assert.deepEqual(store.welcome(),welcome);store.close();
   const other=new StartupSettingsStore(file,'other','other-private-code');assert(other.verify('other-private-code'));assert.equal(other.welcome().revision,'initial');assert.equal(other.image(welcome.welcome.imageId),undefined);other.close();
   const db=new DatabaseSync(file);const secrets=JSON.stringify(db.prepare('SELECT value FROM startup_access').all());assert(!secrets.includes('initial-private-code'));assert(!secrets.includes('new-private-code'));assert(secrets.includes('digest'));db.close();

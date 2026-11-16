@@ -29,6 +29,6 @@ void initializePreferenceStorage().then(() => {
   const root = document.getElementById('root')!;
   const message = document.createElement('p'); message.textContent = '无法读取本地偏好：' + String(error);
   const retry = document.createElement('button'); retry.textContent = '重试'; retry.onclick = () => location.reload();
-  const logs = document.createElement('button'); logs.textContent = '打开日志文件夹'; logs.onclick = () => { void window.slowTuneDesktop?.openDirectory('logs'); };
+  const logs = document.createElement('button'); logs.textContent = '打开日志文件夹'; logs.onclick = () => { void window.biBiMusicDesktop?.openDirectory('logs'); };
   root.replaceChildren(message, retry, logs);
 });

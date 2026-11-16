@@ -17,7 +17,7 @@ export function WelcomeScreen({settings,image,children,preview=false}:{settings:
     <div className="welcome-layout">
       <header className="welcome-header"><span className="welcome-signature"><HeadphonesIcon size={23} weight="bold"/><span>{brand.english}</span></span>{!preview&&<ThemeToggle/>}</header>
       <main className="welcome-content">
-        <section className="welcome-card" aria-label="欢迎来到慢听">
+        <section className="welcome-card" aria-label="欢迎来到哔哔音乐">
           <span className="welcome-eyebrow">YOUR PERSONAL MUSIC SPACE</span>
           <h1>{brand.name}</h1><p className="welcome-tagline">{brand.tagline}</p>
           <div className="welcome-action">{children}</div>

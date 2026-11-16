@@ -21,6 +21,7 @@
 }
 @media(max-width:1250px) {
   .app { --sidebar-width:190px; --queue-width:300px; }
+  .sidebar>.brand { font-size:var(--brand-size-compact); letter-spacing:0; }
   .topbar { padding:0 var(--sp-5); }
   .main-content { padding:var(--sp-5); }
   .immersive.has-queue .main-content { padding-right:calc(var(--queue-width) + var(--sp-5)); }

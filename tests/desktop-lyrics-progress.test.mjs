@@ -37,7 +37,7 @@ test('HTTP progress, cancellation and complete-search ambiguity checks preserve 
   let release;const gate=new Promise(resolve=>release=resolve);
   const {store,provider}=setup(t,async input=>{if(new URL(input).hostname==='music.163.com'){await gate;return Response.json({code:200,result:{songs:[{id:124,name:'晴天',artists:[{name:'另一歌手'}],duration:270000}]}});}return Response.json([row]);});
   const app=createLyricsRouter(store,provider,()=> 'test'),ref={provider:'bilibili',kind:'video',id:'BV0000000001',part:'1'};
-  const post=(path,body)=>app.request('http://localhost'+path,{method:'POST',headers:{'X-Music-App':'1','X-SlowTune-Surface':'desktop','Content-Type':'application/json'},body:JSON.stringify(body)});
+  const post=(path,body)=>app.request('http://localhost'+path,{method:'POST',headers:{'X-Music-App':'1','X-BiBiMusic-Surface':'desktop','Content-Type':'application/json'},body:JSON.stringify(body)});
   const response=await post('/search-progress',query),reader=response.body.getReader();const first=JSON.parse(new TextDecoder().decode((await reader.read()).value));assert.equal(first.complete,false);assert.equal(first.candidates[0].id,'123');
   const resolving=post('/resolve',{ref,title:'晴天',durationSeconds:270});await delay(5);assert.equal(store.read(ref).document,null);release();const result=await(await resolving).json();assert.equal(result.matched,false);assert.equal(result.candidates.length,2);await reader.cancel();
   const old=store.read(ref);const saved=store.update(ref,old.revision,state=>{state.document={...row,provider:'local',id:'choice',title:'手动',artists:[],synced:true,lines:[{startMs:0,text:'manual'}]};state.offsetMs=1500;},signal());
@@ -54,21 +54,21 @@ test('uncached document consumers cancel independently; the final departure canc
 test('one HTTP budget covers search plus document and cannot commit a late automatic choice',async t=>{
   const {store,provider}=setup(t,async(input,{signal})=>{const url=new URL(input),search=url.pathname.includes('search');await delay(search?15:80,undefined,{signal});if(url.hostname==='lrclib.net')return Response.json([]);return Response.json(search?{code:200,result:{songs:[{id:123,name:'晴天',artists:[{name:'周杰伦'}],duration:270000}]}}:{code:200,lrc:{lyric:'[00:01]歌词'}});});
   const app=createLyricsRouter(store,provider,()=> 'test',45),ref={provider:'bilibili',kind:'video',id:'BV0000000001',part:'1'};
-  const response=await app.request('http://localhost/resolve',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-SlowTune-Surface':'desktop'},body:JSON.stringify({ref,...query})});
+  const response=await app.request('http://localhost/resolve',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-BiBiMusic-Surface':'desktop'},body:JSON.stringify({ref,...query})});
   assert.equal(response.status,503);assert.equal((await response.json()).error.code,'timeout');assert.equal(store.read(ref).document,null);
 });
 test('desktop operation budget includes a stalled request body and closes the input stream',async t=>{
   const {store,provider}=setup(t,async()=>assert.fail('must not reach a provider'));let cancelled=0,timer;
   const app=createLyricsRouter(store,provider,()=> 'test',35);
   const body=new ReadableStream({start(c){c.enqueue(new TextEncoder().encode('{"title":"晴天"'));timer=setTimeout(()=>{c.enqueue(new TextEncoder().encode('}'));c.close();},200);},cancel(){cancelled++;clearTimeout(timer);}});
-  const response=await app.request(new Request('http://localhost/search',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-SlowTune-Surface':'desktop'},body,duplex:'half'}));
+  const response=await app.request(new Request('http://localhost/search',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-BiBiMusic-Surface':'desktop'},body,duplex:'half'}));
   assert.equal(response.status,503);assert.equal((await response.json()).error.code,'timeout');assert.equal(cancelled,1);
 });
 test('a concurrent desktop lyric choice and offset win over a late automatic candidate',async t=>{
   let release;const gate=new Promise(resolve=>release=resolve);
   const {store,provider}=setup(t,async input=>{await gate;return Response.json(new URL(input).hostname==='music.163.com'?{code:200,result:{songs:[]}}:[row]);});
   const app=createLyricsRouter(store,provider,()=> 'test'),ref={provider:'bilibili',kind:'video',id:'BV0000000001',part:'1'};
-  const pending=app.request('http://localhost/resolve',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-SlowTune-Surface':'desktop'},body:JSON.stringify({ref,...query})});await delay(5);
+  const pending=app.request('http://localhost/resolve',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-BiBiMusic-Surface':'desktop'},body:JSON.stringify({ref,...query})});await delay(5);
   const saved=store.update(ref,null,state=>{state.document={provider:'local',id:'manual',title:'人工选择',artists:[],synced:true,lines:[{startMs:0,text:'保留'}]};state.offsetMs=750;},signal());release();
   const result=await(await pending).json();assert.equal(result.matched,false);assert.deepEqual(result.state,saved);
 });

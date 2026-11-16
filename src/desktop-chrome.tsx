@@ -6,11 +6,11 @@ type WindowMode = 'standard' | 'welcome' | 'welcome-artwork' | 'immersive';
 let mode: WindowMode = 'welcome';
 
 function syncAppearance() {
-  window.slowTuneDesktop?.setWindowAppearance({ theme: getThemeState().resolved, mode });
+  window.biBiMusicDesktop?.setWindowAppearance({ theme: getThemeState().resolved, mode });
 }
 
 export function initializeDesktopChrome() {
-  const api = window.slowTuneDesktop;
+  const api = window.biBiMusicDesktop;
   if (!api) return;
   document.documentElement.dataset.desktopHost = 'true';
   document.documentElement.dataset.desktopMode = mode;
@@ -21,7 +21,7 @@ export function initializeDesktopChrome() {
 
 export function useDesktopWindowMode(next: WindowMode, enabled = true) {
   useLayoutEffect(() => {
-    if (!enabled || !window.slowTuneDesktop) return;
+    if (!enabled || !window.biBiMusicDesktop) return;
     mode = next;
     document.documentElement.dataset.desktopMode = mode;
     syncAppearance();
@@ -29,6 +29,6 @@ export function useDesktopWindowMode(next: WindowMode, enabled = true) {
 }
 
 export function DesktopImmersiveChrome() {
-  if (!window.slowTuneDesktop) return null;
+  if (!window.biBiMusicDesktop) return null;
   return <div className="desktop-immersive-chrome"><div className="desktop-window-drag" aria-hidden="true"/></div>;
 }

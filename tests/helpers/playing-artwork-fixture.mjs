@@ -22,8 +22,8 @@ function toneFixture(seconds, changing = false) {
 export async function createPlayingArtworkFixture({ preview = false, artwork, librarySeed, handleRequest, beforeWrite } = {}) {
   const root = resolve(process.env.MUSIC_APP_TEST_BUILD ?? '.');
   const tracks = [
-    { ref: { provider: 'bilibili', kind: 'video', id: 'BV1tX4y1W7Xm', part: '900' }, resourceId: 'artwork-first', url: 'https://www.bilibili.com/video/BV1tX4y1W7Xm?p=1', title: '海边慢听 · 风从远方来', uploader: { name: 'SlowTune' }, artwork: 'https://i1.hdslb.com/fixture-artwork.png', durationSeconds: 24 },
-    { ref: { provider: 'bilibili', kind: 'video', id: 'BV1234567890', part: '901' }, resourceId: 'artwork-second', url: 'https://www.bilibili.com/video/BV1234567890?p=1', title: '下一首 · 无封面测试', uploader: { name: 'SlowTune' }, durationSeconds: 6 },
+    { ref: { provider: 'bilibili', kind: 'video', id: 'BV1tX4y1W7Xm', part: '900' }, resourceId: 'artwork-first', url: 'https://www.bilibili.com/video/BV1tX4y1W7Xm?p=1', title: '海边慢听 · 风从远方来', uploader: { name: 'BiBiMusic' }, artwork: 'https://i1.hdslb.com/fixture-artwork.png', durationSeconds: 24 },
+    { ref: { provider: 'bilibili', kind: 'video', id: 'BV1234567890', part: '901' }, resourceId: 'artwork-second', url: 'https://www.bilibili.com/video/BV1234567890?p=1', title: '下一首 · 无封面测试', uploader: { name: 'BiBiMusic' }, durationSeconds: 6 },
   ];
   if (artwork) tracks[0].artwork = artwork;
   const tones = [toneFixture(24, true), toneFixture(6)], preparations = [];

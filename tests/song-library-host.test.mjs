@@ -64,7 +64,7 @@ test('mounted song library enforces host/session boundaries and clears previews 
     return { status: response.status, data: response.headers.get('content-type')?.includes('json') ? JSON.parse(text) : text, cookie: response.headers.get('set-cookie')?.split(';')[0], headers: response.headers };
   };
   const login = async (accessKey = config.accessKey, cookie = '') => { const value = await api('/api/login', { accessKey }, cookie); assert.equal(value.status, 200, JSON.stringify(value.data)); return value.cookie; };
-  const preview = (cookie, snapshot, revision) => api('/api/song-library/imports/preview?mode=append', snapshot, cookie, { 'X-SlowTune-Revision': revision ?? 'null' });
+  const preview = (cookie, snapshot, revision) => api('/api/song-library/imports/preview?mode=append', snapshot, cookie, { 'X-BiBiMusic-Revision': revision ?? 'null' });
   const holdBody = (path, body, cookie) => {
     const text = JSON.stringify(body); let outgoing;
     const response = new Promise((resolve, reject) => {
@@ -116,14 +116,14 @@ test('mounted song library enforces host/session boundaries and clears previews 
   const queryMatch=await api('/api/song-library/playback',{selection:{kind:'query',query:{title:'公开歌曲',artists:['公开歌手']}},searchMode:'title-artists'},owner);assert.equal(queryMatch.status,200,JSON.stringify(queryMatch.data));
   const partialMatch=await api('/api/song-library/playback',{selection:{kind:'query',query:{title:'公开',artists:['公开歌手']}},searchMode:'title-artists'},owner);assert.equal(partialMatch.status,400);assert.equal(partialMatch.data.error.code,'no-match','short embedded names do not establish song identity');
   assert.deepEqual(searchQueries,['公开歌曲','公开歌曲 公开歌手','公开歌曲','公开 公开歌手','公开'],'desktop strategy reaches both real routes; public lookup remains anonymous with a saved account');
-  const desktopHeaders={'X-SlowTune-Surface':'desktop'},capability='slowtune-desktop-audio';
+  const desktopHeaders={'X-BiBiMusic-Surface':'desktop'},capability='bibimusic-desktop-audio';
   assert(!(await api('/v1/handshake',undefined,owner)).data.capabilities[0].operations.includes(capability));
   assert((await api('/v1/handshake',undefined,owner,desktopHeaders)).data.capabilities[0].operations.includes(capability));
   const optimized=await api('/api/search/resolve',{title:'公开歌曲',artists:['公开歌手'],searchMode:'title-artists'},owner,desktopHeaders);
-  assert.equal(optimized.status,200,JSON.stringify(optimized.data));assert(optimized.headers.get('X-SlowTune-Operation'));
+  assert.equal(optimized.status,200,JSON.stringify(optimized.data));assert(optimized.headers.get('X-BiBiMusic-Operation'));
   const token=optimized.data.entry.verifiedAudio.preparationToken;assert.match(token,/^[\w-]{32}$/);
   const count=audioPrepares,prepareInput={protocol:2,request:{ref:lyricRef,formatId:'aac',media:'audio'}};
-  const prepareHeaders={...desktopHeaders,'X-SlowTune-Audio-Support':'["audio/mp4; codecs=\\"mp4a\\""]','X-SlowTune-Preparation':token};
+  const prepareHeaders={...desktopHeaders,'X-BiBiMusic-Audio-Support':'["audio/mp4; codecs=\\"mp4a\\""]','X-BiBiMusic-Preparation':token};
   const prepared=await api('/v1/call/prepare',prepareInput,owner,prepareHeaders);
   assert.equal(prepared.status,200,JSON.stringify(prepared.data));assert.equal(audioPrepares,count,'the real mounted service consumes the verified preparation without another upstream prepare');
   assert(prepared.data.result.leaseId);assert.equal(new URL(prepared.data.result.delivery.url).origin,base);
@@ -133,7 +133,7 @@ test('mounted song library enforces host/session boundaries and clears previews 
   await fetch(base+'/v1/leases/'+repeated.data.result.leaseId,{method:'DELETE',headers:{Cookie:owner,'X-Music-App':'1'}});
   const observed=(await api('/api/status',undefined,owner)).data.desktopPlayback;
   assert(observed.events.some(event=>event.code==='verified-reuse'));assert(!JSON.stringify(observed).includes(token));assert.equal(observed.tickets,0);
-  assert.equal((await api('/v1/call/prepare',prepareInput,owner,{...prepareHeaders,'X-SlowTune-Audio-Support':'bad'})).status,400);
+  assert.equal((await api('/v1/call/prepare',prepareInput,owner,{...prepareHeaders,'X-BiBiMusic-Audio-Support':'bad'})).status,400);
   const timedSelection={kind:'query',query:{title:'超时',artists:['公开歌手']}};
   const timed=await api('/api/song-library/playback',{selection:timedSelection,searchMode:'title-artists'},owner,desktopHeaders);assert.equal(timed.status,503);assert.equal(timed.data.error.code,'timeout');
   assert.equal((await api('/api/song-library/playback',{selection:timedSelection},owner)).status,400,'the existing mobile error status stays unchanged');
@@ -146,7 +146,7 @@ test('mounted song library enforces host/session boundaries and clears previews 
   const conflict = await api('/api/song-library/edits', { revision: null, edits }, owner);
   assert.equal(conflict.status, 409); assert.equal(conflict.data.error.currentRevision, saved.data.revision);
   const exported = await api('/api/song-library/export', undefined, owner);
-  assert.deepEqual(exported.data, saved.data.snapshot); assert.match(exported.headers.get('content-disposition'), /slowtune-library\.json/);
+  assert.deepEqual(exported.data, saved.data.snapshot); assert.match(exported.headers.get('content-disposition'), /bibimusic-library\.json/);
   assert.deepEqual((await api('/api/song-library/events', undefined, owner)).data, { revision: saved.data.revision });
   const other = new SongLibraryStore(config.database + '.song-library.sqlite', 'intruder');
   try { assert.equal(other.read().revision, null); assert.deepEqual(other.read().document.snapshot.songs, []); } finally { other.close(); }

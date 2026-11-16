@@ -12,10 +12,10 @@ export async function readSongBackupFile(file: Blob): Promise<string> {
 export async function previewSongBackupImport(text: string, mode: 'append' | 'replace', revision: string | null, signal?: AbortSignal) {
   previewSongBackup(text);
   try {
-    const response = await fetch('/api/song-library/imports/preview?mode=' + mode, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Music-App': '1', 'X-SlowTune-Revision': revision ?? 'null' }, body: text, signal });
+    const response = await fetch('/api/song-library/imports/preview?mode=' + mode, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Music-App': '1', 'X-BiBiMusic-Revision': revision ?? 'null' }, body: text, signal });
     const result = await response.json();
     if (!response.ok) {
-      if (response.status === 401 && result.error?.code === 'authentication') window.dispatchEvent(new Event('slowtune:session-expired'));
+      if (response.status === 401 && result.error?.code === 'authentication') window.dispatchEvent(new Event('bibimusic:session-expired'));
       throw new ApiError(result.error?.code ?? 'network', result.error?.currentRevision);
     }
     return result;

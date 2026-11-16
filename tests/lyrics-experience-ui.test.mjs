@@ -110,7 +110,7 @@ test('floating lyrics pan to real media time, stop when paused, keep the first l
   await page.addInitScript(()=>{
     const state={preferences:{visible:true,locked:false,fontSize:48,lines:2,translations:true,color:'#ffffff',highlight:'#f4cd87'},document:{sourceKey:'long',offsetMs:1000,durationMs:24000,synced:true,lines:[{startMs:0,text:'很长很长的一句歌词，从这里唱到远方，让每一个字都能够看清楚'},{startMs:10000,text:'听风',words:[{text:'听',startMs:10000,endMs:12000},{text:'风',startMs:12000,endMs:14000}]},{startMs:18000,text:'最后一行也有足够长的内容，可以跟随整句真实时间缓缓阅读'}]},clock:{sourceKey:'long',position:1,playing:true}};
     const callbacks={};window.__lyricState=state;window.__lyricCallbacks=callbacks;
-    window.slowTuneLyrics={getState:async()=>state,onState:fn=>callbacks.state=fn,onDocument:fn=>callbacks.document=fn,onClock:fn=>callbacks.clock=fn,onPointerLeave:()=>{},updatePreferences:async patch=>{Object.assign(state.preferences,patch);callbacks.state(state);return state.preferences;},command:()=>{},showPlayer:()=>{},setUnlockTarget:()=>{},setOptionsOpen:async()=>{},resetPosition:async()=>{},openSettings:()=>{}};
+    window.biBiMusicLyrics={getState:async()=>state,onState:fn=>callbacks.state=fn,onDocument:fn=>callbacks.document=fn,onClock:fn=>callbacks.clock=fn,onPointerLeave:()=>{},updatePreferences:async patch=>{Object.assign(state.preferences,patch);callbacks.state(state);return state.preferences;},command:()=>{},showPlayer:()=>{},setUnlockTarget:()=>{},setOptionsOpen:async()=>{},resetPosition:async()=>{},openSettings:()=>{}};
   });
   await page.goto(fixture.base+'/desktop/lyrics.html');await page.waitForFunction(()=>document.querySelector('#current')?.dataset.overflow==='true');
   const shift=()=>page.locator('.line-content').evaluate(el=>parseFloat(el.style.getPropertyValue('--line-shift')));
@@ -119,13 +119,13 @@ test('floating lyrics pan to real media time, stop when paused, keep the first l
   await clock(6);const middle=await shift();assert(middle< -100);await clock(10.5);assert(await shift()<middle);
   await page.evaluate(()=>{window.__lyricState.clock.playing=false;window.__lyricCallbacks.clock(window.__lyricState.clock);});const paused=await shift();await page.waitForTimeout(250);assert.equal(await shift(),paused);
   const lane=await page.locator('#current').boundingBox();
-  await page.evaluate(()=>window.slowTuneLyrics.updatePreferences({lines:1}));assert.deepEqual(await page.locator('#current').boundingBox(),lane);
-  await page.evaluate(()=>window.slowTuneLyrics.updatePreferences({lines:2}));assert.deepEqual(await page.locator('#current').boundingBox(),lane);
+  await page.evaluate(()=>window.biBiMusicLyrics.updatePreferences({lines:1}));assert.deepEqual(await page.locator('#current').boundingBox(),lane);
+  await page.evaluate(()=>window.biBiMusicLyrics.updatePreferences({lines:2}));assert.deepEqual(await page.locator('#current').boundingBox(),lane);
   await clock(12);assert.equal(await page.locator('.word').count(),2);assert.equal(await page.locator('.word').first().evaluate(el=>el.style.getPropertyValue('--fill')),'0.5');
   await clock(21);assert(await shift()<0);
   await page.screenshot({path:join(artifacts,'floating-long-line.png'),omitBackground:true});
   await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.querySelector('.line-content')?.style.getPropertyValue('--line-shift')==='0px');assert.equal(await page.locator('.line-content').evaluate(el=>el.getAnimations().length),0);
-  await page.evaluate(()=>window.slowTuneLyrics.updatePreferences({fontSize:64}));
+  await page.evaluate(()=>window.biBiMusicLyrics.updatePreferences({fontSize:64}));
   const current=await page.locator('#current').boundingBox(),secondary=await page.locator('#secondary').boundingBox();assert(current.y+current.height<=secondary.y+1);assert(secondary.y+secondary.height<=233);
   assert.deepEqual(errors,[]);
 });

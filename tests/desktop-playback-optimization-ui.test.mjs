@@ -13,7 +13,7 @@ async function setup(t){
   let fixture,preparations=0,formatReads=0;
   const work=new DesktopPlayback(()=> 'fixture'),format={id:'wav',codec:'pcm',mimeType:'audio/wav',container:'wav'},delivery=new MediaDelivery({now:Date.now,fetch});
   const rawApi={
-    capabilities:()=>({provider:'bilibili',operations:['metadata','prepare','formats','slowtune-desktop-audio'],anonymous:true,limitations:[]}),
+    capabilities:()=>({provider:'bilibili',operations:['metadata','prepare','formats','bibimusic-desktop-audio'],anonymous:true,limitations:[]}),
     metadata:async ref=>fixture.tracks.find(track=>track.ref.id===ref.id),
     formats:async()=>{formatReads++;return [format];},
     prepare:async request=>{preparations++;const index=fixture.tracks.findIndex(track=>track.ref.id===request.ref.id),entry=fixture.tracks[index];return {entry,resourceId:entry.resourceId,format,delivery:{url:fixture.base+'/media/'+index+'.wav',requiresHost:true}};},
@@ -32,10 +32,10 @@ async function setup(t){
     const chunks=[];for await(const chunk of request)chunks.push(chunk);
     const controller=new AbortController();response.on('close',()=>{if(!response.writableEnded)controller.abort();});
     const options={method:request.method,headers:request.headers,signal:controller.signal,...(chunks.length?{body:Buffer.concat(chunks)}:{})};
-    const sourceApi=new Proxy(rawApi,{get(target,property){if(property==='prepare'&&request.headers['x-slowtune-audio-support'])return (input,options)=>work.prepare(target,input,options,JSON.parse(request.headers['x-slowtune-audio-support']),request.headers['x-slowtune-preparation']);return Reflect.get(target,property);}});
+    const sourceApi=new Proxy(rawApi,{get(target,property){if(property==='prepare'&&request.headers['x-bibimusic-audio-support'])return (input,options)=>work.prepare(target,input,options,JSON.parse(request.headers['x-bibimusic-audio-support']),request.headers['x-bibimusic-preparation']);return Reflect.get(target,property);}});
     const service=createMusicService(sourceApi,delivery,{baseUrl:fixture.base,providers:['bilibili']});
     const invoke=s=>service.fetch(new Request(url, {...options,signal:s}));
-    const result=request.headers['x-slowtune-surface']==='desktop'?await work.run('fixture',url.pathname,controller.signal,invoke):await invoke(controller.signal);
+    const result=request.headers['x-bibimusic-surface']==='desktop'?await work.run('fixture',url.pathname,controller.signal,invoke):await invoke(controller.signal);
     response.writeHead(result.status,Object.fromEntries(result.headers));
     if(result.body)Readable.fromWeb(result.body).pipe(response);else response.end();return true;
   }});

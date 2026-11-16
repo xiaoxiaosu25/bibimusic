@@ -3,6 +3,7 @@ import { basename, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const productRoot = fileURLToPath(new URL('..', import.meta.url));
+// Resolve the existing Studio instance; branding alone must not select a new empty one.
 
 function studioDirectory(root) {
   const parent = dirname(resolve(root));

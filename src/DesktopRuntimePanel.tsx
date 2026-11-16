@@ -30,11 +30,11 @@ export function DesktopRuntimePanel({ status, checkedAt, account, library, onRef
       <div><dt>YouTube</dt><dd>{!youtube ? '未知' : youtube.enabled === false ? '已关闭' : youtube.checking ? '正在检查工具' : youtube.available ? '取源工具可用' : '当前不可用'}<Button variant="plain" className="settings-text-link" onClick={onOpenSources}>管理音乐来源</Button></dd></div>
       <div><dt>歌单与收藏</dt><dd>{library ? `${library.snapshot.playlists.length} 个歌单 · ${library.snapshot.favorites.length} 首收藏` : '未知'}</dd></div>
     </dl>
-    {status?.build?.stale && <p className="feedback">程序已更新，请退出后重新打开慢听。</p>}
+    {status?.build?.stale && <p className="feedback">程序已更新，请退出后重新打开哔哔音乐。</p>}
     <section className="settings-group"><h4>诊断复制</h4><p className="muted">复制版本、运行环境、来源状态与错误分类。缺失信息标为未知；不含凭据、媒体地址、账号身份或私人路径，不自动上传。</p><Button variant="secondary"  disabled={!!busy} onClick={() => void run('copy', async () => {
       let runtime;
-      try { runtime = await window.slowTuneDesktop!.getRuntimeInfo(); } catch { /* unknown fields remain explicit */ }
-      await window.slowTuneDesktop!.copyDiagnostics(desktopDiagnostics({ runtime, status, account, checkedAt, refreshFailed, operationError }));
+      try { runtime = await window.biBiMusicDesktop!.getRuntimeInfo(); } catch { /* unknown fields remain explicit */ }
+      await window.biBiMusicDesktop!.copyDiagnostics(desktopDiagnostics({ runtime, status, account, checkedAt, refreshFailed, operationError }));
       setMessage('诊断信息已复制。');
     })}>{busy === 'copy' ? '正在复制…' : '复制诊断信息'}</Button></section>
     <div className="settings-action-row"><p className="muted">停止播放并释放资源，保留当前队列。</p><Button variant="secondary"  disabled={!!busy} onClick={() => void run('stop', async () => { if (!await onStopPlayback()) throw new Error('未能停止播放，请重试。'); setMessage('播放已停止。'); })}>停止播放</Button></div>

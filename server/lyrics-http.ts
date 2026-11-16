@@ -13,7 +13,7 @@ function object(value: unknown, fields: string[]): asserts value is Record<strin
 }
 export function createLyricsRouter(store: LyricsStore, providers: LyricProviders, identity: (context: Context) => string,operationBudgetMs=20000) {
   const app = new Hono();
-  const desktop=(c:Context)=>c.req.header('X-SlowTune-Surface')==='desktop';
+  const desktop=(c:Context)=>c.req.header('X-BiBiMusic-Surface')==='desktop';
   const signals=new WeakMap<Request,AbortSignal>();
   const operationSignal=(c:Context)=>{if(!desktop(c))return c.req.raw.signal;let signal=signals.get(c.req.raw);if(!signal){signal=AbortSignal.any([c.req.raw.signal,AbortSignal.timeout(operationBudgetMs)]);signals.set(c.req.raw,signal);}return signal;};
   app.use('*', async (c, next) => {

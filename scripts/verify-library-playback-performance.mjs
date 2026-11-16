@@ -60,7 +60,7 @@ if(process.argv.includes('--host')){
       if(url.pathname==='/backup-input'){json({revision:store.revision(),backup});return;}
       const chunks=[];for await(const chunk of req)chunks.push(chunk);
       const controller=new AbortController();res.on('close',()=>{if(!res.writableEnded)controller.abort();});
-      const headers=new Headers(req.headers);headers.set('X-SlowTune-Surface','desktop');
+      const headers=new Headers(req.headers);headers.set('X-BiBiMusic-Surface','desktop');
       const response=await router.fetch(new Request('http://'+req.headers.host+url.pathname+url.search,{method:req.method,headers,signal:controller.signal,...(req.method==='POST'?{body:Buffer.concat(chunks)}:{})}));
       res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));
     }catch(error){res.writeHead(500,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{code:error.code??'measurement-failed'}}));}
@@ -88,7 +88,7 @@ if(process.argv.includes('--host')){
         const ping=()=>{const start=performance.now();const task=fetch('/ping').then(r=>r.json()).then(()=>pings.push(performance.now()-start));pending.push(task);};
         const timer=setInterval(ping,40);let status=200,bytes=0,durationMs;
         try{await new Promise(r=>setTimeout(r,160));const start=performance.now();
-          if(operation){const response=await fetch(operation.path,{method:operation.body||operation.raw?'POST':'GET',headers:{'Content-Type':'application/json','X-Music-App':'1','X-SlowTune-Surface':'desktop','X-SlowTune-Revision':revision??'null'},...(operation.raw?{body:operation.raw}:operation.body?{body:JSON.stringify(operation.body)}:{})});status=response.status;bytes=(await response.arrayBuffer()).byteLength;}
+          if(operation){const response=await fetch(operation.path,{method:operation.body||operation.raw?'POST':'GET',headers:{'Content-Type':'application/json','X-Music-App':'1','X-BiBiMusic-Surface':'desktop','X-BiBiMusic-Revision':revision??'null'},...(operation.raw?{body:operation.raw}:operation.body?{body:JSON.stringify(operation.body)}:{})});status=response.status;bytes=(await response.arrayBuffer()).byteLength;}
           else await new Promise(r=>setTimeout(r,500));durationMs=performance.now()-start;await new Promise(r=>setTimeout(r,240));
         }finally{clearInterval(timer);await Promise.all(pending);}
         pings.sort((a,b)=>a-b);return {status,bytes,durationMs,requestLatency:{samples:pings.length,p95Ms:pings[Math.ceil(pings.length*.95)-1],maxMs:Math.max(0,...pings)},playback:{before,after:audio.currentTime,paused:audio.paused,mediaError:audio.error?.code??null,events:window.mediaEvents.slice(eventsBefore)},server:await fetch('/measure/end').then(r=>r.json())};

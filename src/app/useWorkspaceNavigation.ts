@@ -291,7 +291,7 @@ export function useWorkspaceNavigation({
     setSearchOpen(false);
     openSettings();
   };
-  useEffect(() => window.slowTuneDesktop?.onOpenLyricsSettings(() => openDesktopSettings.current()), []);
+  useEffect(() => window.biBiMusicDesktop?.onOpenLyricsSettings(() => openDesktopSettings.current()), []);
   const toggleListeningPanel = (panel: 'queue' | 'comments') => {
     setVersionsOpen(false);
     const switching = listeningPanel !== panel;

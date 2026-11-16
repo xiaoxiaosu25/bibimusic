@@ -7,7 +7,7 @@ import { initializePreferenceStorage } from '../../src/preference-storage';
 const params = new URLSearchParams(location.search), desktop = !params.has('mobile');
 let quits = 0, preparations = 0, releaseMetadata;
 if (params.has('host')) {
-  window.slowTuneDesktop = { readPreferences: async () => ({}), writePreference: async () => {}, onCommand: () => () => {}, quit: () => { quits++; } };
+  window.biBiMusicDesktop = { readPreferences: async () => ({}), writePreference: async () => {}, onCommand: () => () => {}, quit: () => { quits++; } };
 }
 localStorage.clear();
 const tracks = [1, 2].map(index => ({ ref: { provider: 'bilibili', kind: 'video', id: 'BV000000000' + index, part: String(index) },

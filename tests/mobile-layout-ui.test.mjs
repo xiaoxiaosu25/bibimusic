@@ -85,7 +85,7 @@ test('mobile navigation, player and direct lyrics keep one audio session and fit
   await page.getByRole('button',{name:'返回音乐库',exact:true}).click();
   await primary.getByRole('button',{name:'我的',exact:true}).click();
   await page.getByRole('region',{name:'我的',exact:true}).waitFor();
-  assert.equal(await page.evaluate(()=>history.state?.slowTuneMobileNavigation?.page),'profile','the visible page is already committed before reload');
+  assert.equal(await page.evaluate(()=>history.state?.biBiMusicMobileNavigation?.page),'profile','the visible page is already committed before reload');
   await page.reload();await primary.waitFor();await page.goBack();
   await page.locator('.mobile-library').waitFor();
   assert.equal(await page.locator('audio').evaluate(audio=>audio.paused),true,'reload restores the queue without autoplay');
@@ -104,7 +104,7 @@ test('mobile navigation, player and direct lyrics keep one audio session and fit
 
 test('mobile long titles leave lyrics and queue readable on short portrait and landscape screens', {timeout:60000}, async t => {
   const title = '风从远方来，陪你走过城市里每一段安静又漫长的夜晚 · 现场特别版本';
-  const fixture = await createMobileFixture({title,artists:['SlowTune 演示与一位名字很长的合作歌手']}), browser = await chromium.launch({headless:true});
+  const fixture = await createMobileFixture({title,artists:['BiBiMusic 演示与一位名字很长的合作歌手']}), browser = await chromium.launch({headless:true});
   t.after(async()=>{await browser.close();await fixture.close();});
   const context = await browser.newContext({viewport:{width:320,height:568},hasTouch:true});
   await context.addInitScript(record=>localStorage.setItem('slow-listening:playback:v3',JSON.stringify(record)),queueRecord(fixture.tracks));

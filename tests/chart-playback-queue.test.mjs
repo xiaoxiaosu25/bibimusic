@@ -7,7 +7,7 @@ import ts from 'typescript';
 // Exercise the product hook with the fixed, real QueueController. Only React,
 // media and source I/O are replaced, so cancellation races are deterministic.
 const contextKey=Symbol.for('music-app:chart-playback-test');
-const playbackUrl=process.env.SLOWTUNE_COMPARE_SOURCE??new URL('../src/playback.ts',import.meta.url).href;
+const playbackUrl=process.env.BIBIMUSIC_COMPARE_SOURCE??new URL('../src/playback.ts',import.meta.url).href;
 const mockUrl='data:text/javascript,'+encodeURIComponent(`
   const context=()=>globalThis[Symbol.for('music-app:chart-playback-test')];
   export const useRef=value=>context().useRef(value);
@@ -107,12 +107,12 @@ function harness(t,search,savedPlayback,desktop=false){
   return {api,render,player,client,bridge,calls,played,get queue(){return engine().queue;},records:()=>{const e=engine();return {tracks:e.tracks.size,aliases:e.aliases.size,committed:e.committed.size};}};
 }
 
-if(process.env.SLOWTUNE_COMPARE_OUTPUT)test('controlled continuity comparison',async t=>{
+if(process.env.BIBIMUSIC_COMPARE_OUTPUT)test('controlled continuity comparison',async t=>{
   const h=harness(t,async()=>undefined,undefined,true),tracks=batchTracks(Array.from({length:30},(_,index)=>'track-'+index)),samples=[];let reads=0;
   h.client.metadata=async ref=>{reads++;await new Promise(resolve=>setTimeout(resolve,4));return tracks.find(track=>track.ref.id===ref.id);};
   for(let sample=0;sample<10;sample++){const start=performance.now(),before=reads;await h.api.playAll(tracks);samples.push({ms:performance.now()-start,metadataReads:reads-before});}
   const retained=h.records();await h.api.clear();
-  writeFileSync(process.env.SLOWTUNE_COMPARE_OUTPUT,JSON.stringify({samples,retainedAfterTenReplacements:retained,afterClear:h.records()},null,2));
+  writeFileSync(process.env.BIBIMUSIC_COMPARE_OUTPUT,JSON.stringify({samples,retainedAfterTenReplacements:retained,afterClear:h.records()},null,2));
 });
 
 test('saved song selections prepare fresh audio without a preliminary metadata request, re-read defaults and update names without reloading audio',async t=>{

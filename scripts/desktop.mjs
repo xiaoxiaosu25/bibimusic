@@ -26,7 +26,7 @@ export function desktopLaunchOptions(root = productRoot, environment = process.e
 // Followers receive the same result rather than scheduling another restart.
 export async function singleDesktopLaunch(identity, selection, work) {
   const digest = createHash('sha256').update(resolve(identity).toLowerCase()).digest('hex').slice(0, 32);
-  const address = process.platform === 'win32' ? `\\\\.\\pipe\\slowtune-launch-${digest}` : join(tmpdir(), `slowtune-launch-${digest}.sock`);
+  const address = process.platform === 'win32' ? `\\\\.\\pipe\\bibimusic-launch-${digest}` : join(tmpdir(), `bibimusic-launch-${digest}.sock`);
   const clients = new Set(); let outcome;
   const server = createServer(socket => {
     clients.add(socket); socket.setTimeout(5000, () => socket.destroy());
@@ -90,7 +90,7 @@ Add-Type @'
 using System;
 using System.Text;
 using System.Runtime.InteropServices;
-public static class SlowTuneRestartWindows {
+public static class BiBiMusicRestartWindows {
   private delegate bool Visitor(IntPtr window, IntPtr parameter);
   [DllImport("user32.dll")] private static extern bool EnumWindows(Visitor visitor, IntPtr parameter);
   [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint pid);
@@ -110,20 +110,20 @@ public static class SlowTuneRestartWindows {
   }
 }
 '@
-$appArgument='(?:^|\\s)"?'+[regex]::Escape($env:SLOWTUNE_RESTART_APP)+'"?(?:\\s|$)'
-$targets=@(Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:SLOWTUNE_RESTART_ELECTRON -and $_.CommandLine -match $appArgument -and $_.CommandLine -notmatch '--type=' })
-if($env:SLOWTUNE_RESTART_CUSTOM_DATA -and $targets.Count -gt 0) {
+$appArgument='(?:^|\\s)"?'+[regex]::Escape($env:BIBIMUSIC_RESTART_APP)+'"?(?:\\s|$)'
+$targets=@(Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:BIBIMUSIC_RESTART_ELECTRON -and $_.CommandLine -match $appArgument -and $_.CommandLine -notmatch '--type=' })
+if($env:BIBIMUSIC_RESTART_CUSTOM_DATA -and $targets.Count -gt 0) {
   throw '发现同源码目录的旧桌面，无法确认其是否使用所选自定义资料目录。请先退出该桌面后重试；未停止服务。'
 }
 foreach($target in $targets) {
   if(Get-Process -Id $target.ProcessId -ErrorAction SilentlyContinue) {
-    if(-not [SlowTuneRestartWindows]::Close($target.ProcessId)) { throw '原桌面没有可关闭的窗口，请先退出慢听。' }
+    if(-not [BiBiMusicRestartWindows]::Close($target.ProcessId)) { throw '原桌面没有可关闭的窗口，请先退出哔哔音乐。' }
     Write-Output $target.ProcessId
   }
 }`;
   const result = await run('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
     // Cold Windows hosts can spend more than 15 seconds initializing CIM and Add-Type.
-    env: { ...environment, SLOWTUNE_RESTART_APP: join(root, 'desktop'), SLOWTUNE_RESTART_ELECTRON: electron, SLOWTUNE_RESTART_CUSTOM_DATA: environment.MUSIC_APP_DESKTOP_DATA ? resolve(data) : '' }, windowsHide: true, timeout: 45000, maxBuffer: 65536,
+    env: { ...environment, BIBIMUSIC_RESTART_APP: join(root, 'desktop'), BIBIMUSIC_RESTART_ELECTRON: electron, BIBIMUSIC_RESTART_CUSTOM_DATA: environment.MUSIC_APP_DESKTOP_DATA ? resolve(data) : '' }, windowsHide: true, timeout: 45000, maxBuffer: 65536,
   });
   for (const line of result.stdout.trim().split(/\s+/).filter(Boolean)) { const pid = Number(line); if (Number.isInteger(pid) && pid > 0) await waitForExit(pid); }
 }
@@ -191,7 +191,7 @@ export async function launchDesktop({ detached = false, restart = false } = {}) 
       launched.launchToken = token;
       child = launched;
     } finally { if (log !== undefined) closeSync(log); }
-    try { await waitForDesktop(child, data, token); console.log('慢听已打开。'); }
+    try { await waitForDesktop(child, data, token); console.log('哔哔音乐已打开。'); }
     catch (error) { await stopDesktopForRestart({ root: productRoot, data, electron, environment: { ...environment, MUSIC_APP_DESKTOP_DATA: data } }); throw error; }
   });
   if (!child) return 0;
@@ -203,5 +203,5 @@ export async function launchDesktop({ detached = false, restart = false } = {}) 
 if (import.meta.main) {
   const args = process.argv.slice(2);
   if (args.some(arg => !['--detach', '--restart'].includes(arg))) { console.error('仅支持 --detach 和 --restart。'); process.exitCode = 1; }
-  else launchDesktop({ detached: args.includes('--detach'), restart: args.includes('--restart') }).then(code => { process.exitCode = code; }).catch(error => { console.error('慢听桌面启动失败：' + (error.stderr?.trim() || error.message)); process.exitCode = 1; });
+  else launchDesktop({ detached: args.includes('--detach'), restart: args.includes('--restart') }).then(code => { process.exitCode = code; }).catch(error => { console.error('哔哔音乐桌面启动失败：' + (error.stderr?.trim() || error.message)); process.exitCode = 1; });
 }

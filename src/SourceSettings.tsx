@@ -9,7 +9,7 @@ import { MobileChoiceSheet, MobileSettingRow } from './MobileSettingsControls';
 const displayChoices = [{value:'show',label:'正常显示'},{value:'dim',label:'变灰'},{value:'hide',label:'隐藏'}] as const;
 
 export function SourceSettings({state,onChanged,onOpenAbout,mobile=false}:{state?:SourceSettingsState;onChanged:(value:SourceSettingsState)=>void;onOpenAbout?:()=>void;mobile?:boolean}){
-  const desktop=!!window.slowTuneDesktop;
+  const desktop=!!window.biBiMusicDesktop;
   const [busy,setBusy]=useState(false),[message,setMessage]=useState('');
   const [draft,setDraft]=useState<{enabled?:boolean;disabledDisplay?:DisabledDisplay}>();
   const [choosing,setChoosing]=useState(false);

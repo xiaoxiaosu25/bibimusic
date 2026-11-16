@@ -49,7 +49,8 @@ export function createSongLibraryRouter(service: SongLibraryService, identity: (
     const owner = identity(c); if (!owner) throw new SongLibraryError('authentication'); c.set('owner', owner);
     const origin = c.req.header('Origin');
     if (origin && origin !== new URL(c.req.url).origin || !['GET', 'HEAD'].includes(c.req.method) && c.req.header('X-Music-App') !== '1') throw new SongLibraryError('origin-denied');
-    c.header('Cache-Control', 'no-store'); c.header('X-Content-Type-Options', 'nosniff'); await service.store.onSurface(c.req.header('X-SlowTune-Surface')==='desktop',next);
+    const isDesktop = c.req.header('X-BiBiMusic-Surface') === 'desktop';
+    c.header('Cache-Control', 'no-store'); c.header('X-Content-Type-Options', 'nosniff'); await service.store.onSurface(isDesktop, next);
   });
   app.get('/', async c => {
     const response = service.store.desktopResponse({ type: 'read' }, c.req.raw.signal);
@@ -57,11 +58,11 @@ export function createSongLibraryRouter(service: SongLibraryService, identity: (
   });
   app.get('/export', async c => {
     const response=service.store.desktopResponse({type:'export'},c.req.raw.signal);
-    return c.body(response?await response:service.export(),200,{'Content-Type':'application/json','Content-Disposition':'attachment; filename="slowtune-library.json"'});
+    return c.body(response?await response:service.export(),200,{'Content-Type':'application/json','Content-Disposition':'attachment; filename="bibimusic-library.json"'});
   });
   app.get('/events', c => c.json({ revision: service.revision() }));
   app.post('/covers/source', async c => {
-    if (c.req.header('X-SlowTune-Surface') !== 'desktop') throw new SongLibraryError('unsupported');
+    if (c.req.header('X-BiBiMusic-Surface') !== 'desktop') throw new SongLibraryError('unsupported');
     return c.json(await covers.source(await json(c.req.raw), c.req.raw.signal));
   });
   app.post('/catalog/search', async c => {
@@ -97,7 +98,7 @@ export function createSongLibraryRouter(service: SongLibraryService, identity: (
   });
   app.post('/edits', async c => {
     const input = await json(c.req.raw); object(input, ['revision', 'edits']);
-    if (Array.isArray(input.edits) && input.edits.some(e => e?.type === 'set-playlist-cover') && c.req.header('X-SlowTune-Surface') !== 'desktop') throw new SongLibraryError('unsupported');
+    if (Array.isArray(input.edits) && input.edits.some(e => e?.type === 'set-playlist-cover') && c.req.header('X-BiBiMusic-Surface') !== 'desktop') throw new SongLibraryError('unsupported');
     const expected = revision(input.revision);
     const response = service.store.desktopResponse({ type: 'edit', revision: expected, edits: input.edits }, c.req.raw.signal);
     return response ? c.body(await response, 200, { 'Content-Type': 'application/json; charset=UTF-8' }) : c.json(service.execute(expected, input.edits, c.req.raw.signal));
@@ -145,7 +146,7 @@ export function createSongLibraryRouter(service: SongLibraryService, identity: (
   });
   app.post('/imports/preview', async c => {
     const mode = c.req.query('mode'); if (!['append', 'replace'].includes(mode ?? '')) throw new SongLibraryError('invalid-input');
-    const expected = c.req.header('X-SlowTune-Revision');
+    const expected = c.req.header('X-BiBiMusic-Revision');
     const value=await readSongBody(c.req.raw),base=revision(expected==='null'?null:expected);
     const response=service.store.fileResponse({type:'import-preview',owner:c.get('owner'),value,mode:mode as 'append'|'replace',revision:base},c.req.raw.signal);
     return response?c.body(await response,200,{'Content-Type':'application/json; charset=UTF-8'}):c.json(service.previewImport(c.get('owner'),value,mode as 'append'|'replace',base,c.req.raw.signal));
@@ -157,8 +158,9 @@ export function createSongLibraryRouter(service: SongLibraryService, identity: (
     return response?c.body(await response,200,{'Content-Type':'application/json; charset=UTF-8'}):c.json(service.commitImport(c.get('owner'),input.token,expected,c.req.raw.signal));
   });
   app.onError((error, c) => {
+    const isDesktop = c.req.header('X-BiBiMusic-Surface') === 'desktop';
     const code = c.req.raw.signal.aborted&&c.req.raw.signal.reason?.name==='TimeoutError'?'timeout':error instanceof SongLibraryError || error instanceof MusicSourceError || error instanceof MusicSearchError || error instanceof SongCatalogError ? error.code : c.req.raw.signal.aborted ? 'cancelled' : 'storage';
-    return c.json({ error: { code, ...(error instanceof SongLibraryError ? { currentRevision: error.currentRevision } : {}), ...(error instanceof MusicSourceError ? { provider: error.provider, upstreamCode: error.upstreamCode } : {}) } }, code === 'conflict' ? 409 : code === 'authentication' ? 401 : code === 'origin-denied' ? 403 : code === 'expired' ? 410 : code === 'cancelled' ? 408 : code === 'busy' || code === 'rate-limited' ? 429 : code === 'storage' || code === 'network' || code === 'upstream' || code === 'timeout' && c.req.header('X-SlowTune-Surface') === 'desktop' ? 503 : 400);
+    return c.json({ error: { code, ...(error instanceof SongLibraryError ? { currentRevision: error.currentRevision } : {}), ...(error instanceof MusicSourceError ? { provider: error.provider, upstreamCode: error.upstreamCode } : {}) } }, code === 'conflict' ? 409 : code === 'authentication' ? 401 : code === 'origin-denied' ? 403 : code === 'expired' ? 410 : code === 'cancelled' ? 408 : code === 'busy' || code === 'rate-limited' ? 429 : code === 'storage' || code === 'network' || code === 'upstream' || code === 'timeout' && isDesktop ? 503 : 400);
   });
   app.all('*', c => c.json({ error: { code: 'not-found' } }, 404));
   return app;

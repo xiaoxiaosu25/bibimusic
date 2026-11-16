@@ -162,7 +162,7 @@ export function usePlayback(client:MusicClient, youtubeAvailable=false, partsSto
       const format=q.loaded?player.currentMetadata?.format as AudioFormat|undefined:undefined;
       clock.publish({position:player.currentTime,duration:Number.isFinite(player.duration)&&player.duration>0?player.duration:current?.durationSeconds,buffered:player.buffered.map(range=>({start:range.start,end:range.end}))});
       setSnapshot({current,currentId:q.current?.id??e?.restored,format,audioSelection:player.currentPlan?.metadata?.audioSelection as AudioSelection|undefined,position:player.currentTime,duration:Number.isFinite(player.duration)&&player.duration>0?player.duration:current?.durationSeconds,playing:player.state==='playing'&&!player.paused,loading:q.loading,volume:player.volume,rate:player.playbackRate,muted:player.muted,buffered:player.buffered.map(range=>({start:range.start,end:range.end})),items,order:q.order,repeat:q.repeat,shuffleGroups:q.shuffleGroups,state:player.state,canPrevious:q.canPrevious,canNext:q.canNext});
-      try {const saved=JSON.stringify({version:3,items:items.map(savedQueueEntry),current:q.current?.id??e?.restored,order:q.order,repeat:q.repeat,shuffleGroups:q.shuffleGroups,volume:player.volume,rate:player.playbackRate,muted:player.muted});if(saved!==lastSaved){preferenceStorage().setItem(playbackStorageKey,saved);lastSaved=saved;}}catch{setError(window.slowTuneDesktop?'本地播放偏好无法保存；歌单与收藏仍保存在本应用的资料库。':'浏览器无法保存播放资料；歌单与收藏仍由服务保存。');}
+      try {const saved=JSON.stringify({version:3,items:items.map(savedQueueEntry),current:q.current?.id??e?.restored,order:q.order,repeat:q.repeat,shuffleGroups:q.shuffleGroups,volume:player.volume,rate:player.playbackRate,muted:player.muted});if(saved!==lastSaved){preferenceStorage().setItem(playbackStorageKey,saved);lastSaved=saved;}}catch{setError(window.biBiMusicDesktop?'本地播放偏好无法保存；歌单与收藏仍保存在本应用的资料库。':'浏览器无法保存播放资料；歌单与收藏仍由服务保存。');}
       if(!q.loading&&e?.advanceFailure){const advance=e.advanceFailure;e.advanceFailure=undefined;queueMicrotask(advance);}
     };
     engine.current.sync=update;
@@ -186,7 +186,7 @@ export function usePlayback(client:MusicClient, youtubeAvailable=false, partsSto
       const library=libraryChoices.current;let chosen:ReturnType<typeof chooseSongVersion>|undefined;
       try{chosen=track.selection?chooseSongVersion(track.selection,library.songs,library.versions,library.catalogLinks):undefined;}catch{return;}
       const ref=track.selection?(chosen?.kind==='source'?chosen.ref:undefined):isTrack(track)?track.ref:undefined;
-      if(!ref||!enabled.current&&ref.provider==='youtube'||!client.capabilities(ref.provider).operations.includes('slowtune-desktop-audio'))return;
+      if(!ref||!enabled.current&&ref.provider==='youtube'||!client.capabilities(ref.provider).operations.includes('bibimusic-desktop-audio'))return;
       const selection=audioDefault(),identity=JSON.stringify([queueIdentity,queue.snapshot.current?.id,next.id,selection]);
       owned.prefetch.start(next.id,identity,async signal=>{const result=await request<{entry:Track}>('/api/playback/prefetch',{ref,audioSupport:bridge.audioSupport,audioSelection:selection},signal);if(!result.entry.verifiedAudio?.preparationToken)throw new Error('Prefetch unavailable');return result.entry;});
     };
@@ -198,7 +198,7 @@ export function usePlayback(client:MusicClient, youtubeAvailable=false, partsSto
       if(!desktopSurface())setSnapshot(old=>({...old,...value}));
     };
     const unsubs=[()=>recovery.dispose(),player.on('timeupdate',progress),...['durationchange','pause','statechange','volumechange','ratechange','stop'].map(event=>player.on(event as 'timeupdate',update))];
-    const suspend=window.slowTuneDesktop?.onCommand(command=>{if(command==='suspend')owned.prefetch?.cancel();});if(suspend)unsubs.push(suspend);
+    const suspend=window.biBiMusicDesktop?.onCommand(command=>{if(command==='suspend')owned.prefetch?.cancel();});if(suspend)unsubs.push(suspend);
     unsubs.push(player.on('diagnostic',event=>recordPlaybackDiagnostic({operation:'player',operationId:recovery.diagnosticId,code:event.code,at:event.timestamp,elapsedMs:event.elapsedMs,reason:event.reason,recovery:event.recovery,timeoutSeconds:event.timeoutSeconds})));
     unsubs.push(player.on('playing',()=>{if(desktopSurface()&&recovery.preparing)setError('');system.activate();update();}),player.on('pauseintent',()=>{owned.prefetch?.cancel();const e=engine.current;if(e&&!e.sourceStopping){e.intent++;if(e.chartSession)e.chartSession.allowed=false;if(e.batchSession)e.batchSession.allowed=false;}}));
     unsubs.push(player.on('loadstart',()=>{if(blockedMedia&&player.currentPlan?.processing?.sessionEndpoint&&player.currentPlan.processing.sessionEndpoint!==blockedMedia.lease)blockedMedia=undefined;owned.prefetch?.retain([queue.snapshot.current?.id??'']);const e=engine.current;if(e&&!e.ownCommit)e.intent++;}),player.on('stop',()=>{owned.prefetch?.cancel();const e=engine.current;if(e&&!e.sourceStopping)e.intent++;}));
@@ -241,7 +241,7 @@ export function usePlayback(client:MusicClient, youtubeAvailable=false, partsSto
       if(desktop||pending?.signal===audioPreparing.current||pending?.signal===versionPreparing.current)pending?.abort();
       if(desktop)owned.recovery.cancelEnvironment();
     };
-    const onSleepComplete=()=>{if(desktopSurface()&&sleep.snapshot.status==='expired'&&sleep.snapshot.action==='close')window.slowTuneDesktop?.quit();};
+    const onSleepComplete=()=>{if(desktopSurface()&&sleep.snapshot.status==='expired'&&sleep.snapshot.action==='close')window.biBiMusicDesktop?.quit();};
     sleep.addEventListener('change',onSleep);
     sleep.addEventListener('expire',onSleepExpire);
     sleep.addEventListener('complete',onSleepComplete);

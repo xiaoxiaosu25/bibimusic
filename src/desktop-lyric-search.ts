@@ -4,8 +4,8 @@ import type { LyricSearch } from '../server/lyrics-types';
 /** Desktop manual lookup: each frame is a complete snapshot, never an automatic choice. */
 export async function desktopLyricSearch(input:unknown,signal:AbortSignal,progress:(value:LyricSearch)=>void):Promise<void>{
   const budget=AbortSignal.any([signal,AbortSignal.timeout(22000)]);
-  const response=await fetch('/api/lyrics/search-progress',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-SlowTune-Surface':'desktop'},body:JSON.stringify(input),signal:budget}).catch(error=>{if(budget.aborted&&!signal.aborted)throw new ApiError('timeout');if(signal.aborted)throw error;throw new ApiError('network');});
-  if(!response.ok){const value=await response.json();if(response.status===401)window.dispatchEvent(new Event('slowtune:session-expired'));throw new ApiError(value.error?.code??'network');}
+  const response=await fetch('/api/lyrics/search-progress',{method:'POST',headers:{'Content-Type':'application/json','X-Music-App':'1','X-BiBiMusic-Surface':'desktop'},body:JSON.stringify(input),signal:budget}).catch(error=>{if(budget.aborted&&!signal.aborted)throw new ApiError('timeout');if(signal.aborted)throw error;throw new ApiError('network');});
+  if(!response.ok){const value=await response.json();if(response.status===401){window.dispatchEvent(new Event('bibimusic:session-expired'));}throw new ApiError(value.error?.code??'network');}
   if(!response.headers.get('Content-Type')?.includes('application/x-ndjson')||!response.body)throw new ApiError('version-mismatch');
   const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',bytes=0,complete=false;
   try{

@@ -61,7 +61,7 @@ export function generateNotices(root = resolve(dirname(fileURLToPath(import.meta
   }
   writeFileSync(join(output, 'notices.json'), JSON.stringify(manifest, null, 2) + '\n');
   writeFileSync(join(output, 'THIRD-PARTY-NOTICES.txt'), [
-    `慢听 ${app.version} — 随应用分发的第三方材料`,
+    `哔哔音乐 ${app.version} — 随应用分发的第三方材料`,
     '本文件列出应用使用的第三方软件与字体，保留其原版权及许可文本。外部 yt-dlp 工具的许可请参阅实际安装的版本及发行物。',
     ...entries.map(entry => [
       `${entry.name} — ${entry.version}`, `用途：${entry.purpose}`,

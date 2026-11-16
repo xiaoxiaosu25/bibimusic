@@ -54,10 +54,10 @@ test('desktop and mobile search preserve platform sort, page and local follow st
     assert.deepEqual(videoRequests.at(-1).song,{title:'许嵩'},'switching search types without changing the query retains the song context');
     await surface.getByRole('button',{name:'用户',exact:true}).click();await surface.getByRole('article',{name:'许嵩',exact:true}).waitFor();
     const card=surface.getByRole('article',{name:'许嵩',exact:true});
-    await card.getByRole('button',{name:'关注到慢听 许嵩',exact:true}).click();await card.getByRole('button',{name:'取消关注 许嵩',exact:true}).waitFor();
+    await card.getByRole('button',{name:'关注到哔哔音乐 许嵩',exact:true}).click();await card.getByRole('button',{name:'取消关注 许嵩',exact:true}).waitFor();
     assert.equal(followRequests.length,1);assert.equal(followRequests[0].action,'follow');
     failFollow=true;await card.getByRole('button',{name:'取消关注 许嵩',exact:true}).click();await card.getByRole('alert').waitFor();assert.equal(await card.getByRole('button',{name:'取消关注 许嵩',exact:true}).getAttribute('aria-pressed'),'true');
-    failFollow=false;await card.getByRole('button',{name:'取消关注 许嵩',exact:true}).click();await card.getByRole('button',{name:'关注到慢听 许嵩',exact:true}).waitFor();
+    failFollow=false;await card.getByRole('button',{name:'取消关注 许嵩',exact:true}).click();await card.getByRole('button',{name:'关注到哔哔音乐 许嵩',exact:true}).waitFor();
     await surface.getByLabel('用户搜索排序').selectOption('followers');await page.waitForFunction(()=>document.querySelector('.creator-search-results[aria-busy="false"]'));assert.equal(userRequests.at(-1).order,'followers');
     await surface.getByRole('button',{name:'用户搜索下一页',exact:true}).click();await surface.getByRole('article',{name:'第二页作者',exact:true}).waitFor();assert.equal(userRequests.at(-1).page,2);
     await page.screenshot({path:join(artifacts,'user-search-'+width+'.png'),fullPage:true});

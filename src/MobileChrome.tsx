@@ -24,7 +24,7 @@ export function MobileHeader({ page, playlistTitle, settingsSection, onSearch, o
       <h1 title={playlistTitle}>{page==='playlist'?playlistTitle||'歌单':mobileSettingsTitles[settingsSection]}</h1>
       {page==='playlist'&&<IconButton className="mobile-detail-search" aria-label="搜索歌曲或视频" onClick={onSearch}><MagnifyingGlassIcon size={23}/></IconButton>}
     </> : <>
-      <div className="mobile-header-title"><HeadphonesIcon size={23}/><h1>{page === 'library' ? '音乐库' : page === 'profile' ? '我的' : '慢听'}</h1></div>
+      <div className="mobile-header-title"><HeadphonesIcon size={23}/><h1>{page === 'library' ? '音乐库' : page === 'profile' ? '我的' : '哔哔音乐'}</h1></div>
       <div className="mobile-header-actions">
         <IconButton  aria-label="搜索歌曲或视频" onClick={onSearch}><MagnifyingGlassIcon size={23}/></IconButton>
         <IconButton  aria-label="粘贴链接" onClick={onLink}><LinkIcon size={22}/></IconButton>
@@ -64,7 +64,7 @@ const profileGroups = [
   { title: '数据与帮助', items: [
     { id: 'access', label: '启动与访问', description: '进入方式与访问码', icon: LockKeyIcon },
     { id: 'diagnostics', label: '数据与诊断', description: '备份、恢复与运行状态', icon: DatabaseIcon },
-    { id: 'about', label: '关于慢听', description: '版本、许可与声明', icon: InfoIcon },
+    { id: 'about', label: '关于哔哔音乐', description: '版本、许可与声明', icon: InfoIcon },
   ] },
 ] as const;
 

@@ -59,13 +59,13 @@ test('desktop disclosures, native diagnostic copy, failed save recovery and imme
   const failedCopy = await application.evaluate(({ clipboard }) => clipboard.readText());
   assert.match(failedCopy, /保留上次信息/); assert.match(failedCopy, /最近操作错误：network/); assert(!failedCopy.includes('PRIVATE'));
   // An isolated directory at the temporary-file location forces a real disk error.
-  await page.evaluate(() => window.slowTuneDesktop.flushPreferences());
+  await page.evaluate(() => window.biBiMusicDesktop.flushPreferences());
   mkdirSync(join(data, 'preferences.json.tmp'));
-  await page.evaluate(() => window.slowTuneDesktop.writePreference('slow-listening:hardening:v1', 'unsaved').catch(() => {}));
+  await page.evaluate(() => window.biBiMusicDesktop.writePreference('slow-listening:hardening:v1', 'unsaved').catch(() => {}));
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor();
   assert.equal(JSON.parse(readFileSync(join(data, 'preferences.json'), 'utf8'))['slow-listening:hardening:v1'], undefined);
   await application.evaluate(({ dialog }) => { globalThis.quitSaveErrors = []; dialog.showErrorBox = (title, message) => globalThis.quitSaveErrors.push({ title, message }); });
-  await page.evaluate(() => window.slowTuneDesktop.quit());
+  await page.evaluate(() => window.biBiMusicDesktop.quit());
   await page.waitForTimeout(300);
   assert.equal((await application.evaluate(() => globalThis.quitSaveErrors)).length, 1);
   assert.equal(application.process().exitCode, null, 'a failed final save keeps the app open');
@@ -75,7 +75,7 @@ test('desktop disclosures, native diagnostic copy, failed save recovery and imme
   assert.equal(JSON.parse(readFileSync(join(data, 'preferences.json'), 'utf8'))['slow-listening:hardening:v1'], 'unsaved');
   // The small, debounced window-state file also reports failure without crashing.
   mkdirSync(join(data, 'desktop-state.json.tmp'));
-  await page.evaluate(() => window.slowTuneDesktop.setWindowAppearance({ theme: 'light', mode: 'standard' }));
+  await page.evaluate(() => window.biBiMusicDesktop.setWindowAppearance({ theme: 'light', mode: 'standard' }));
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor();
   assert.equal(application.process().exitCode, null);
   rmSync(join(data, 'desktop-state.json.tmp'), { recursive: true });
@@ -83,12 +83,12 @@ test('desktop disclosures, native diagnostic copy, failed save recovery and imme
   await page.getByRole('button', { name: '重试保存偏好', exact: true }).waitFor({ state: 'hidden' });
   assert.equal(JSON.parse(readFileSync(join(data, 'desktop-state.json'), 'utf8')).windowTheme, 'light');
   // Queue invokes without waiting for their disk acknowledgements, then close now.
-  await page.evaluate(() => { for (let i = 0; i < 100; i++) void window.slowTuneDesktop.writePreference('slow-listening:hardening:v1', 'final-' + i); });
+  await page.evaluate(() => { for (let i = 0; i < 100; i++) void window.biBiMusicDesktop.writePreference('slow-listening:hardening:v1', 'final-' + i); });
   await closeDesktop(application, { mainWindow: true }); application = undefined;
   assert.equal(JSON.parse(readFileSync(join(data, 'preferences.json'), 'utf8'))['slow-listening:hardening:v1'], 'final-99');
   assert.equal(existsSync(join(data, 'runtime/service.json')), false);
   page = await launch();
-  assert.equal(await page.evaluate(() => window.slowTuneDesktop.readPreferences().then(values => values['slow-listening:hardening:v1'])), 'final-99');
+  assert.equal(await page.evaluate(() => window.biBiMusicDesktop.readPreferences().then(values => values['slow-listening:hardening:v1'])), 'final-99');
   await closeDesktop(application); application = undefined;
   assert.deepEqual(errors, []);
 });

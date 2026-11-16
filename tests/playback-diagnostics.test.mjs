@@ -12,7 +12,7 @@ test('diagnostics retain only bounded safe facts, redact lease paths, and reject
   for(let n=0;n<130;n++)recordPlaybackDiagnostic({operation:'player',code:'media-error',at:n,operationId:'playback-1',reason:'fallback',recovery:'limit',timeoutSeconds:30,positionSeconds:120,paused:true,mediaCode:2,url:'https://private.invalid/token',resourceId:'private-song',error:'secret'});
   const events=playbackDiagnostics();assert.equal(events.length,120);assert.equal(events[0].at,10);assert(!JSON.stringify(events).includes('private'));assert(!JSON.stringify(events).includes('secret'));
   events[0].code='changed';assert.equal(playbackDiagnostics()[0].code,'media-error');
-  diagnostics.observeSourceRequest('/v1/leases/private-token?secret=one',new Response(null,{headers:{'X-SlowTune-Operation':'private-account'}}),performance.now());
+  diagnostics.observeSourceRequest('/v1/leases/private-token?secret=one',new Response(null,{headers:{'X-BiBiMusic-Operation':'private-account'}}),performance.now());
   assert.equal(playbackDiagnostics().at(-1).operation,'/v1/leases/:lease');assert.equal(playbackDiagnostics().at(-1).serverOperation,undefined);
 }));
 
@@ -35,7 +35,7 @@ test('overlapping source invocations retain their own IDs and late lease release
 test('song and chart HTTP preflight retain their selection context on success and network failure',desktop(async()=>{
   const previous=globalThis.fetch;
   try{
-    globalThis.fetch=async()=>Response.json({entry:{}},{headers:{'X-SlowTune-Operation':'desktop-11'}});
+    globalThis.fetch=async()=>Response.json({entry:{}},{headers:{'X-BiBiMusic-Operation':'desktop-11'}});
     await withPlaybackDiagnostic('playback-13',()=>diagnostics.request('/api/song-library/playback',{}));
     let last=playbackDiagnostics().at(-1);assert.equal(last.operationId,'playback-13');assert.equal(last.serverOperation,'desktop-11');assert.match(last.requestId,/^request-/);
     globalThis.fetch=async()=>{throw Error('private failure');};

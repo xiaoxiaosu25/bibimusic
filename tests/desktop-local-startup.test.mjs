@@ -18,14 +18,19 @@ test('real desktop enters its local profile without a code and restores a revoke
   t.after(async () => { if (application) await closeDesktop(application); });
   const splash = await application.firstWindow();
   await splash.waitForURL('**/setup.html');
-  await splash.getByRole('heading', { name: '慢听', exact: true }).waitFor();
-  await splash.waitForFunction(() => performance.getEntriesByName('slowtune:welcome-visible').length > 0);
-  const splashStarted = await splash.evaluate(() => performance.timeOrigin + performance.getEntriesByName('slowtune:welcome-visible').at(-1).startTime);
+  await splash.getByRole('heading', { name: '哔哔音乐', exact: true }).waitFor();
+  assert.equal(await application.evaluate(({ app }) => app.getName()), 'BiBiMusic');
+  assert.equal(await splash.evaluate(() => typeof window.biBiMusicSetup?.getState), 'function');
+  await splash.waitForFunction(() => performance.getEntriesByName('bibimusic:welcome-visible').length > 0);
+  const splashStarted = await splash.evaluate(() => performance.timeOrigin + performance.getEntriesByName('bibimusic:welcome-visible').at(-1).startTime);
   await splash.screenshot({ path: join(data, 'startup.png'), animations: 'disabled' });
   let page;
   for (let n = 0; n < 350; n++) { page = application.windows().find(window => window.url().startsWith('http:')); if (page) break; await new Promise(done => setTimeout(done, 100)); }
   assert(page, 'the player opens automatically');
   await page.getByRole('button', { name: '打开正在播放', exact: true }).waitFor({ timeout: 20000 });
+  assert.match(await page.title(), /哔哔音乐 BiBiMusic/);
+  assert.equal(await page.evaluate(() => typeof window.biBiMusicDesktop?.getState), 'function');
+  assert.equal(await page.evaluate(() => 'slowTuneDesktop' in window), false);
   assert(await page.evaluate(() => performance.timeOrigin) - splashStarted >= 2000, 'the complete splash stays visible for at least two seconds after its artwork and entrance animation finish');
   assert.equal(await page.getByLabel('服务访问码', { exact: true }).count(), 0);
   assert.equal(application.windows().some(window => window.url().endsWith('/setup.html')), false);

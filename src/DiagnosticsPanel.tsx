@@ -24,14 +24,14 @@ export function DiagnosticsPanel({ status, checkedAt, account, library, onRefres
     catch (issue) { setRefreshFailed(true); throw issue; }
   });
   const youtube = status?.providers.youtube;
-  const desktop = !!window.slowTuneDesktop;
+  const desktop = !!window.biBiMusicDesktop;
   const youtubeLabel = !youtube ? '未读取' : youtube.checking ? '正在检查工具' : youtube.available ? '取源工具可用' : youtube.enabled === false ? '已关闭' : '当前不可用';
   const accountLabel = !account ? '未读取' : ({ authenticated: '账号已登录', anonymous: '未登录 · 匿名使用', expired: '登录已过期', unavailable: '账号状态无法读取' }[account.state]);
   if (desktop) return <DesktopRuntimePanel status={status} checkedAt={checkedAt} account={account} library={library} onRefresh={onRefresh} onStopPlayback={onStopPlayback} onOpenSources={onOpenSources} onOpenAccount={onOpenAccount} onOpenAbout={onOpenAbout}/>;
   return <div className="diagnostics-settings settings-stack">
     <header className="settings-section-heading"><div><h3>诊断与数据</h3><p className="muted">查看服务信息、备份资料或处理播放问题。</p></div><RefreshButton label="刷新诊断" busy={busy === 'refresh'} busyLabel="检查中…" disabled={!!busy} onClick={() => void refresh()}/></header>
     <p className="muted diagnostics-checked-at">{checkedAt ? `最近取得服务信息：${new Date(checkedAt).toLocaleString('zh-CN', { hour12: false })}` : '尚未取得服务信息'}{refreshFailed ? ' · 本次检查失败，保留上次信息' : ''}</p>
-    {status?.build?.stale && <p className="feedback" role="status">磁盘上有更新的构建，重启服务后生效。请在服务电脑上重启慢听，再刷新页面。</p>}
+    {status?.build?.stale && <p className="feedback" role="status">磁盘上有更新的构建，重启服务后生效。请在服务电脑上重启哔哔音乐，再刷新页面。</p>}
     <dl className="service-overview">
       <div><dt>服务连接</dt><dd>{refreshFailed ? '本次检查失败' : status ? '最近读取成功' : '等待检查'}<p>仅表示服务响应，不代表所有来源可用。</p></dd></div>
       <div><dt>B站账号</dt><dd>{accountLabel}<Button variant="plain" className="settings-text-link" onClick={onOpenAccount}>检查或管理B站账号</Button></dd></div>

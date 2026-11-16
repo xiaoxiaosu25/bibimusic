@@ -1,4 +1,4 @@
-const api = window.slowTuneSetup;
+const api = window.biBiMusicSetup;
 let revealGeneration = 0;
 async function confirmVisible(generation) {
   await Promise.all([...document.querySelectorAll('img')].filter(image => !image.hidden).map(image => image.decode().catch(() => {})));
@@ -8,7 +8,7 @@ async function confirmVisible(generation) {
   while (document.hidden && generation === revealGeneration) await new Promise(done => document.addEventListener('visibilitychange', done, { once: true }));
   await new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done)));
   if (generation !== revealGeneration) return;
-  performance.mark('slowtune:welcome-visible');
+  performance.mark('bibimusic:welcome-visible');
   api.ready();
 }
 function render(state) {

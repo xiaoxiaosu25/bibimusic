@@ -7,7 +7,7 @@ import { promisify } from 'node:util';
 import { developmentPaths } from './workspace-paths.mjs';
 
 const executable = process.argv[2] && resolve(process.argv[2]);
-if (!executable || !existsSync(executable)) throw new Error('请提供要验证的 Windows 免安装包 SlowTune.exe 绝对路径。');
+if (!executable || !existsSync(executable)) throw new Error('请提供要验证的 Windows 免安装包 BiBiMusic.exe 绝对路径。');
 const delivery = JSON.parse(readFileSync(join(dirname(executable), 'desktop-delivery.json'), 'utf8'));
 const output = join(developmentPaths().testRuntime, 'desktop-package-verification'); mkdirSync(output, { recursive: true });
 const portableData = process.argv.includes('--portable-data');

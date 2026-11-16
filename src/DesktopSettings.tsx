@@ -12,7 +12,7 @@ const colors = [
 ];
 
 export function DesktopLyricsSettings() {
-  const api = window.slowTuneDesktop;
+  const api = window.biBiMusicDesktop;
   const [preferences, setPreferences] = useState<DesktopLyricsPreferences>();
   const [fontSize, setFontSize] = useState('32');
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [message, setMessage] = useState('');
@@ -72,13 +72,13 @@ export function DesktopLyricsSettings() {
 
 export function DesktopDataSettings({ onOpenBackup }: { onOpenBackup: () => void }) {
   const [directory, setDirectory] = useState(''), [error, setError] = useState('');
-  useEffect(() => { void window.slowTuneDesktop?.getDataDirectory().then(setDirectory).catch(issue => setError(String(issue))); }, []);
-  const open = (kind: 'data' | 'logs') => { void window.slowTuneDesktop?.openDirectory(kind).catch(issue => setError(String(issue))); };
+  useEffect(() => { void window.biBiMusicDesktop?.getDataDirectory().then(setDirectory).catch(issue => setError(String(issue))); }, []);
+  const open = (kind: 'data' | 'logs') => { void window.biBiMusicDesktop?.openDirectory(kind).catch(issue => setError(String(issue))); };
   return <div className="settings-stack desktop-data-settings">
     <header className="settings-section-heading"><div><h3>本地资料</h3><p className="muted">你的歌单、收藏与偏好保存在此程序的 data 文件夹。</p></div></header>
     <p className="muted" style={{ overflowWrap: 'anywhere' }}>{directory || '正在读取资料位置…'}</p>
     <div className="settings-form-actions"><Button variant="secondary"  onClick={() => open('data')}>打开资料文件夹</Button><Button variant="secondary"  onClick={() => open('logs')}>打开日志文件夹</Button></div>
-    <section className="settings-group"><h4>备份与恢复</h4><p className="muted">歌单 JSON 备份只包含歌单、收藏及曲目资料和来源，不包含账号、关注、推荐偏好、来源设置、播放偏好或同步关联。</p><p className="muted">完整备份请先退出慢听，确认关闭完成后复制整个 data 文件夹。恢复时先退出，再将完整备份放回资料位置；已有资料先另行保留，不合并目录。更新程序时保留 data。</p><Button variant="secondary"  onClick={onOpenBackup}>歌单 JSON 导入与导出</Button></section>
-    <p className="muted">桌面资料与服务版各自保存。B站凭据由当前 Windows 用户加密保存在 data 中；换电脑或 Windows 用户后可能需要重新登录。</p><p className="muted">关闭主窗口或选择“退出慢听”会停止播放，完成必要保存并关闭本应用的内部服务；最小化可继续播放。退出应用保留账号登录。</p>{error&&<p className="feedback" data-tone="error" role="alert">{error}</p>}
+    <section className="settings-group"><h4>备份与恢复</h4><p className="muted">歌单 JSON 备份只包含歌单、收藏及曲目资料和来源，不包含账号、关注、推荐偏好、来源设置、播放偏好或同步关联。</p><p className="muted">完整备份请先退出哔哔音乐，确认关闭完成后复制整个 data 文件夹。恢复时先退出，再将完整备份放回资料位置；已有资料先另行保留，不合并目录。更新程序时保留 data。</p><Button variant="secondary"  onClick={onOpenBackup}>歌单 JSON 导入与导出</Button></section>
+    <p className="muted">桌面资料与服务版各自保存。B站凭据由当前 Windows 用户加密保存在 data 中；换电脑或 Windows 用户后可能需要重新登录。</p><p className="muted">关闭主窗口或选择“退出哔哔音乐”会停止播放，完成必要保存并关闭本应用的内部服务；最小化可继续播放。退出应用保留账号登录。</p>{error&&<p className="feedback" data-tone="error" role="alert">{error}</p>}
   </div>;
 }

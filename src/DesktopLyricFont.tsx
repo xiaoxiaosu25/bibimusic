@@ -1,7 +1,7 @@
 import { preferenceStorage } from './preference-storage';
 import { useId, useSyncExternalStore } from 'react';
 
-const storageKey = 'slow-listening:desktop-lyric-size:v1', changed = 'slowtune:desktop-lyric-size';
+const storageKey = 'slow-listening:desktop-lyric-size:v1', changed = 'bibimusic:desktop-lyric-size';
 const readSize = () => {
   try { const value = Number(preferenceStorage().getItem(storageKey)); return Number.isInteger(value) && value >= 20 && value <= 40 ? value : 28; }
   catch { return 28; }

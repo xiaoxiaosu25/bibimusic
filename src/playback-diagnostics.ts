@@ -38,7 +38,7 @@ export function recordPlaybackDiagnostic(event:PlaybackDiagnostic){
 export function playbackDiagnostics(){return events.map(event=>({...event}));}
 export function sourceDiagnosticPath(path:string){return path.split('?')[0].replace(/^\/v1\/leases\/[^/]+$/,'/v1/leases/:lease');}
 export function observeSourceRequest(path:string,response:Response,start:number,context:Pick<PlaybackDiagnostic,'operationId'|'requestId'>={}){
-  recordPlaybackDiagnostic({operation:sourceDiagnosticPath(path),code:response.ok?'complete':'failure',at:Date.now(),elapsedMs:performance.now()-start,...context,...(response.headers.get('X-SlowTune-Operation')?{serverOperation:response.headers.get('X-SlowTune-Operation')!}:{})});
+  recordPlaybackDiagnostic({operation:sourceDiagnosticPath(path),code:response.ok?'complete':'failure',at:Date.now(),elapsedMs:performance.now()-start,...context,...(response.headers.get('X-BiBiMusic-Operation')?{serverOperation:response.headers.get('X-BiBiMusic-Operation')!}:{})});
 }
 /** Product facade: preserve public API semantics and remember only temporary lease ownership. */
 export function tracePlaybackApi(api:MusicApi,context:()=>string|undefined):MusicApi{

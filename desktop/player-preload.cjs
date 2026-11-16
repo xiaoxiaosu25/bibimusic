@@ -4,7 +4,7 @@ const subscribe = (channel, callback) => {
   ipcRenderer.on(channel, listener);
   return () => ipcRenderer.removeListener(channel, listener);
 };
-contextBridge.exposeInMainWorld('slowTuneDesktop', {
+const desktopAPI = {
   getState: () => ipcRenderer.invoke('desktop:state'),
   restoreLocalSession: () => ipcRenderer.invoke('desktop:restore-local-session'),
   setLyricsVisible: visible => ipcRenderer.invoke('desktop:preferences', { visible }),
@@ -28,8 +28,9 @@ contextBridge.exposeInMainWorld('slowTuneDesktop', {
   playbackReleased: (ok = true) => ipcRenderer.send('desktop:released', ok),
   onState: callback => subscribe('desktop:state', callback),
   onCommand: callback => subscribe('desktop:command', callback),
-});
-contextBridge.exposeInMainWorld('slowTuneSetup', {
+};
+contextBridge.exposeInMainWorld('biBiMusicDesktop', desktopAPI);
+const setupAPI = {
   getState: () => ipcRenderer.invoke('desktop:setup-state'),
   ready: () => ipcRenderer.send('desktop:setup-visible'),
   retry: () => ipcRenderer.invoke('desktop:setup-retry'),
@@ -37,4 +38,5 @@ contextBridge.exposeInMainWorld('slowTuneSetup', {
   openData: () => ipcRenderer.invoke('desktop:open-directory', 'data'),
   quit: () => ipcRenderer.send('desktop:setup-quit'),
   onState: callback => subscribe('desktop:setup-state', callback),
-});
+};
+contextBridge.exposeInMainWorld('biBiMusicSetup', setupAPI);

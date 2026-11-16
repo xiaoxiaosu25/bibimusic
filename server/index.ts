@@ -267,7 +267,7 @@ const protectSession:MiddlewareHandler=async(c,next)=>{
   const owner=getCookie(c,'music_session')??'',session=sessions.get(owner);
   if(!session||session.expiresAt<=Date.now()){
     if(session)await expireSession(owner);
-    c.header('X-SlowTune-Session','expired');
+    c.header('X-BiBiMusic-Session','expired');
     return c.json(c.req.path.startsWith('/v1/')?{protocol:2,error:{code:'authentication',retryable:false}}:{error:{code:'authentication'}},401);
   }
   // Reuse one lifetime for body reads, source work, media streams and the library's
@@ -278,10 +278,11 @@ const protectSession:MiddlewareHandler=async(c,next)=>{
     c.req.raw=new Request(raw,{signal,...(body?{body}:{})});
     const operationId=desktopPlayback.current?.id;
     await next();
-    if(operationId)c.header('X-SlowTune-Operation',operationId);
+    if(operationId)c.header('X-BiBiMusic-Operation',operationId);
     desktopPlayback.response(c.res.status);
   };
-  if(c.req.header('X-SlowTune-Surface')==='desktop'&&desktopSourcePath(c.req.path)){
+  const isDesktop = c.req.header('X-BiBiMusic-Surface')==='desktop';
+  if(isDesktop&&desktopSourcePath(c.req.path)){
     const priority=c.req.path==='/api/playback/prefetch'?0:c.req.path.includes('playback')||c.req.path.endsWith('/resolve')||c.req.path.endsWith('/prepare')||c.req.path.endsWith('/formats')?2:c.req.path.includes('search')?1:0;
     await desktopPlayback.run(owner,c.req.path,signal,proceed,priority);
   }else await proceed(signal);
@@ -303,7 +304,7 @@ app.post('/api/settings/access',async c=>{
 });
 app.get('/api/settings/welcome',c=>c.json(startupSettings.welcome()));
 app.post('/api/settings/welcome',async c=>{const input=await json(c.req.raw,4*1024*1024+16384);c.req.raw.signal.throwIfAborted();return c.json(startupSettings.saveWelcome(input));});
-app.get('/api/settings/welcome/export',c=>{c.header('Content-Disposition','attachment; filename="slowtune-welcome.json"');return c.json(startupSettings.exportWelcome());});
+app.get('/api/settings/welcome/export',c=>{c.header('Content-Disposition','attachment; filename="bibimusic-welcome.json"');return c.json(startupSettings.exportWelcome());});
 app.get('/api/settings/sources',c=>c.json(sourceState()));
 app.get('/api/settings/search',c=>c.json(searchSettings.read()));
 app.post('/api/settings/search',async c=>{
@@ -417,11 +418,12 @@ app.all('/v1/*',c=> {
   if(c.req.path.startsWith('/v1/call/') && !['metadata','discover','search','list','prepare','formats','shelf'].includes(c.req.path.split('/').at(-1)!)) return c.json({protocol:2,error:{code:'unsupported',retryable:false}},400);
   const sourceApi=desktopPlayback.current?new Proxy(counted,{get(target,property){
     if(property==='capabilities')return (provider:import('@studio/music-sources').ProviderId)=>{const capabilities=target.capabilities(provider);return {...capabilities,operations:[...capabilities.operations,desktopAudioCapability]};};
-    if(property==='prepare'&&c.req.header('X-SlowTune-Audio-Support')!==undefined)return (input:Parameters<MusicApi['prepare']>[0],options:import('@studio/music-sources').CallOptions)=>{
-      let support;try{support=validateAudioSupport(JSON.parse(c.req.header('X-SlowTune-Audio-Support')!));}catch{throw new MusicSourceError({code:'invalid-input',retryable:false});}
-      const token=c.req.header('X-SlowTune-Preparation');
+    const audioSupportHeader = c.req.header('X-BiBiMusic-Audio-Support');
+    if(property==='prepare'&&audioSupportHeader!==undefined)return (input:Parameters<MusicApi['prepare']>[0],options:import('@studio/music-sources').CallOptions)=>{
+      let support;try{support=validateAudioSupport(JSON.parse(audioSupportHeader));}catch{throw new MusicSourceError({code:'invalid-input',retryable:false});}
+      const token=c.req.header('X-BiBiMusic-Preparation');
       if(!support||token!==undefined&&!/^[\w-]{32}$/.test(token))throw new MusicSourceError({code:'invalid-input',retryable:false});
-      const header=c.req.header('X-SlowTune-Audio-Selection');let selection;
+      const header=c.req.header('X-BiBiMusic-Audio-Selection');let selection;
       try{if(header&&header.length>512)throw Error();selection=audioSelection(header===undefined?undefined:JSON.parse(header));}catch{throw new MusicSourceError({code:'invalid-input',retryable:false});}
       return desktopPlayback.prepare(target,input,options,support,token,selection);
     };
@@ -444,7 +446,7 @@ app.use('/*',serveStatic({root:join(root,'dist/client')}));
 app.get('*',serveStatic({root:join(root,'dist/client'),path:'index.html'}));
 const stateFile=join(config.runtimeDirectory,'service.json');
 youtube.setEnabled(sourceSettings.youtube.enabled);
-const server=serve({fetch:app.fetch,hostname:config.host,port:config.port}, info=>{writeFileSync(stateFile,JSON.stringify({pid:process.pid,port:config.port,key:adminKey}),{mode:0o600});console.log(`慢听已启动 http://localhost:${info.port} · 正式构建 · ${sourceSettings.youtube.enabled?'YouTube 已开启':'YouTube 已关闭'}`);});
+const server=serve({fetch:app.fetch,hostname:config.host,port:config.port}, info=>{writeFileSync(stateFile,JSON.stringify({pid:process.pid,port:config.port,key:adminKey}),{mode:0o600});console.log(`哔哔音乐已启动 http://localhost:${info.port} · 正式构建 · ${sourceSettings.youtube.enabled?'YouTube 已开启':'YouTube 已关闭'}`);});
 const recentRegion=browseCache.read<string>('preferences','youtube-region');
 songSync.start();
 const warmRegions=[...new Set([defaultYoutubeRegion,...(isYoutubeRegion(recentRegion)?[recentRegion]:[])])];
